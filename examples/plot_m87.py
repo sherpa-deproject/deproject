@@ -44,4 +44,6 @@ set_plot_ylabel('Density (cm^{-3})')
 limits(X_AXIS, 0.2, 10)
 print_window('m87_density', ['format', 'png'])
 
+add_set_clear_window('temperature')
+log_scale()
 

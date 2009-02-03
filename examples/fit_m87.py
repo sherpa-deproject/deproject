@@ -4,12 +4,11 @@ redshift = 0.004233                     # M87 redshift
 arcsec_per_pixel = 0.492                # ACIS plate scale
 
 radii = numpy.arange(30., 640., 30) * arcsec_per_pixel
-dep = Deproject(radii)
-dep.theta = 75                          # A 75 degree sector was used
+dep = Deproject(radii, theta=75)
 
 # Load datasets for each annulus
-for ann in range(dep.nshell):
-    dep.load_pha('m87/r%dgrspec.pha' % (ann+1), annulus=ann)
+for annulus in range(len(radii)-1):
+    dep.load_pha('m87/r%dgrspec.pha' % (annulus+1))
 
 # Subtract background
 dep.subtract()

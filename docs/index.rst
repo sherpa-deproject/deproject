@@ -87,7 +87,6 @@ commands like `freeze`_ or `set_par`_ to a stack of spectral datasets.
 
 Densities
 ^^^^^^^^^^^
-
 Physical densities (cm^-3) for each shell can be calculated with
 :mod:`deproject` assuming the source model is based on a thermal model with the
 "standard" normalization (from the `XSPEC`_ documentation):
@@ -136,37 +135,116 @@ default case of full 360 degree annuli this is not needed.::
   radii = numpy.arange(30., 640., 30) * arcsec_per_pixel
   dep = Deproject(radii, theta=75)
 
-  # Load datasets for each annulus
-  for ann in range(dep.nshell):
-      dep.load_pha('m87/r%dgrspec.pha' % (ann+1), annulus=ann)
+Now load the PHA spectral files for each annulus using the Python ``range``
+function to loop over a sequence ranging from 0 to the last annulus.  The
+``load_pha()`` call is the first example of a :mod:`deproject` method
+(i.e. function) that mimics a *Sherpa* function with the same name.  In this
+case ``dep.load_pha(file)`` loads the PHA file using the *Sherpa* `load_pha`_
+function but also registers the dataset in the spectral stack.
 
-  # Subtract background
-  dep.subtract()
+  for annulus in range(len(radii)-1):
+      dep.load_pha('m87/r%dgrspec.pha' % (annulus+1))
 
-  # Set source model and ignore specified energy ranges
-  dep.set_source('xswabs*xsmekal')
+With the data loaded we set the source model for each of the spherical shells
+with the ``set_source()` method.  This is one of the more complex bits of
+:mod:`deproject`.  It automatically generates all the model components for each
+shell and then assigns volume-weighted linear combinations of those components
+as the source model for each of the annulus spectral datasets.::
+
+  dep.set_source('xswabs * xsmekal')
+
+The model expression can be any valid *Sherpa* model expression with the following
+caveats:
+
+ - Only the generic model type should be specified in the expression.  In
+   typical *Sherpa* usage one generates the model component name in the
+   model expression, e.g. ``set_source("xswabs.abs1 * xsmekal.mek1")``.  This
+   would create model components named ``abs1`` and ``mek1``.  In
+   ``dep.set_source()`` the model component names are auto-generated as 
+   ``<model_type>_<shell>``.
+ - Only one of each model type can be used in the model expression.  A source
+   model expression like "xsmekal + gauss1d + gauss1d" would result in an error
+   due to the model component auto-naming.
+
+Now the energy range used in the fitting is restricted using the stack version
+of the *Sherpa* `ignore`_ command.  The `notice`_ command is also available.
+
   dep.ignore(None, 0.5)
   dep.ignore(1.8, 2.2)
   dep.ignore(7, None)
 
-  # Specify Galactic absorption
+Next any required parameter values are set and their `freeze`_ or `thaw`_
+status are set.  
+
   dep.set_par('xswabs.nh', 0.0255)
   dep.freeze("xswabs.nh")
-
-  # Initialize abundance to 0.5 and thaw
+  
   dep.set_par('xsmekal.abundanc', 0.5)
   dep.thaw('xsmekal.abundanc')
-
-  # Set redshift
+  
   dep.set_par('xsmekal.redshift', redshift)
 
-  # Do the initial onion-peeling fit
+As a convenience if any of the model components have a 
+``redshift`` parameter that value will be used as the default redshift for
+calculating the angular size distance.  
+
+At this point the model is completely set up and we are ready to do the initial
+"onion-peeling" fit.  As for normal high-signal fitting with binned spectra we
+issue the commands to set the optimization method, set the fit statistic, and
+configure *Sherpa* to `subtract`_ the background when doing model fitting.
+Finally the :mod:`deproject` ``fit()`` method is called to perform the fit.
+
   set_method("levmar")                    # Levenberg-Marquardt optimization method
   set_stat("chi2gehrels")                 # Gehrels Chi^2 fit statistic
+  dep.subtract()
   dep.fit()
 
+After the fit process each shell model has an association normalization that
+can be used to calculate the densities.  This is where the source angular
+diameter distance is used.  By default the angular diameter distance is
+determined with :mod:`cosmocalc` using the redshift found as a source model
+parameter.  This can be overridden in one of two ways.  First by setting the
+redshift and relying on :mod:`cosmocalc` to determine the angular size distance:
+
+  dep.redshift = 0.1234   # Set redshift
+  print dep.angdist       # Angdist calculated using standard WMAP cosmology
+
+The second way is to explicitly set the angular size distance in cm:
+
+  dep.angdist = 1.2345e28
+
+The electron density is then calculated with the ``get_density()`` method and
+plotted in *Sherpa*:
+
+  density_ne = dep.get_density()
+  rad_arcmin = (dep.radii[:-1] + dep.radii[1:]) / 2.0 / 60.
+  add_curve(rad_arcmin, density_ne)
+  set_curve(['symbol.color', 'red', 'line.color', 'red'])
+  set_plot_xlabel('Radial distance (arcmin)')
+  set_plot_ylabel('Density (cm^{-3})')
+  limits(X_AXIS, 0.2, 10)
+  print_window('m87_density', ['format', 'png'])
+
+In the image below the density computed with :mod:`deproject` is plotted in
+red.  The white curve shows the density determined with an independent
+onion-peeling analysis by P. Nulsen using a custom perl script to generate
+`XSPEC`_ model definition and fit commands.  The agreement is good:
 
 .. image:: m87_density.png
+
+Likewise the temperature profile from the :mod:`deproject` analysis matches the
+`XSPEC`_ analysis.
+
+  kt = dep.get_par('xsmekal.kt')   # returns array of kT values
+  add_window()
+  add_curve(rad_arcmin, kt) 
+  set_plot_xlabel('Radial distance (arcmin)')
+  set_plot_ylabel('Density (cm^{-3})')
+
+.. image:: m87_temperature.png
+
+The unphysical temperature oscillations seen here highlights a known issue
+with this analysis method.
 
 Module documentation
 ====================

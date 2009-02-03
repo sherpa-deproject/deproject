@@ -1,3 +1,15 @@
+"""
+Manipulate a stack of spectra in Sherpa.
+
+The methods in the SpecStack class provide a way to automatically apply
+familiar Sherpa commands such as ``set_par``_ or ``freeze``_ or ``plot_fit``_
+to a stack of PHA spectra.  This simplifies simultaneous fitting of
+multiple spectra.
+
+Note that the :mod:`specstack` module is currently distributed within with the
+:mod:`deproject` package.  `Specstack` is not yet fully documented or tested
+outside the context of `deproject`.  
+"""
 import re
 import numpy
 import sherpa.astro.ui as SherpaUI
@@ -11,7 +23,7 @@ def sherpa_plot_func(func):
 
 class SpecStack(object):
     """
-    Manipulate a stack of spectra in sherpa.
+    Manipulate a stack of spectra in Sherpa.
     """
     def __init__(self):
         self.datasets = []
@@ -20,17 +32,12 @@ class SpecStack(object):
         self.srcmodel_comps = []        # Generic model components in source model expression
         self.model_comps = []           # All instantiated model components for shells
 
-    def load_pha(self, specfile, annulus):
+    def load_pha(self, specfile):
         """
         Load a pha file and add to the datasets for stacked analysis.
 
         :param specfile: extracted source PHA/PI spectrum file
-        :param annulus: annulus number corresponding to the ``radii`` list (starts at 0)
         """
-        if annulus < 0 or annulus >= self.nshell:
-            raise ValueError('annulus=%d must be between 0 to %d inclusive' %
-                             (annulus, self.nshell-1))
-
         dataid = len(self.datasets)
         print 'Loading spectrum file %s as dataset id %d' % (specfile, dataid)
         SherpaUI.load_pha(dataid, specfile)
@@ -40,7 +47,6 @@ class SpecStack(object):
         except TypeError:
             obsid = 0
         dataset = dict(file=specfile,
-                       annulus=annulus,
                        obsid=obsid,
                        id=dataid,
                        )
@@ -86,7 +92,19 @@ class SpecStack(object):
 
         return norms[0]
 
+    def _get_n_datasets(self):
+        """
+        Return the number of datasets
+        :rtype: int"""
+        return len(self.datasets)
+
+    n_datasets = property(_get_n_datasets)
+
     def _sherpa_cmd(self, func, *args):
+        """
+        Apply an arbitrary Sherpa function to each of the datasets.
+        :rtype: None
+        """
         for dataset in self.datasets:
             func(dataset['id'], *args)
 
@@ -95,11 +113,11 @@ class SpecStack(object):
         self._sherpa_cmd(SherpaUI.subtract, *args)
 
     def notice(self, *args):
-        """Wrapper around sherpa notice command."""
+        """Apply Sherpa notice command to each dataset."""
         self._sherpa_cmd(SherpaUI.notice_id, *args)
 
     def ignore(self, *args):
-        """Wrapper around sherpa ignore command."""
+        """Apply Sherpa ignore command to each dataset."""
         self._sherpa_cmd(SherpaUI.ignore_id, *args)
 
     def _sherpa_par(self, func, par, msg, *args):
@@ -128,19 +146,48 @@ class SpecStack(object):
         return vals
 
     def thaw(self, par):
+        """Apply thaw command to specified parameter for each dataset.
+
+        :param par: parameter specifier in format <model_type>.<par_name>
+        :rtype: None
+        """
         self._sherpa_par(SherpaUI.thaw, par, 'Thawing %s')
 
     def freeze(self, par):
+        """Apply freeze command to specified parameter for each dataset.
+
+        :param par: parameter specifier in format <model_type>.<par_name>
+        :rtype: None
+        """
         self._sherpa_par(SherpaUI.freeze, par, 'Freezing %s')
 
     def set_par(self, par, val):
+        """Set parameter value for each dataset.
+
+        :param par: parameter specifier in format <model_type>.<par_name>
+        :param val: parameter value
+        :rtype: None
+        """
         self._sherpa_par(SherpaUI.set_par, par, 'Setting %%s=%s' % str(val), val)
 
     def get_par(self, par):
+        """Get array of parameter values for datasets.
+
+        :param par: parameter specifier in format <model_type>.<par_name>
+        :param val: parameter value
+        :rtype: numpy array of parameter value ordered by dataset
+        """
         pars = self._sherpa_par(SherpaUI.get_par, par, 'Getting %s')
         return numpy.array([x.val for x in pars])
 
     def _sherpa_plot(self, func, *args, **kwargs):
+        """Call Sherpa plot ``func`` for each dataset.
+
+        :param func: Sherpa plot function
+        :param args: plot function list arguments
+        :param kwargs: plot function named (keyword) arguments
+        :rtype: None
+        """
         for shell in range(self.nshell):
             window_id = 'Shell%d' % shell
             try:
@@ -159,12 +206,19 @@ class SpecStack(object):
             pychips.set_current_window(window_id)
             func(*new_args, **kwargs)
 
-    log_scale = sherpa_plot_func(pychips.log_scale)
-    linear_scale = sherpa_plot_func(pychips.linear_scale)
     def print_window(self, *args, **kwargs):
+        """Print window for each dataset.
+
+        :param args: list arguments to pass to print_window
+        :param kwargs: named (keyword) arguments to pass to print_window
+        :rtype: None
+        """
         if len(args) > 0:
             args = tuple([args[0] + '%d']) + args[1:]
         self._sherpa_plot(pychips.plot_window, *args, **kwargs)
+
+    log_scale = sherpa_plot_func(pychips.log_scale)
+    linear_scale = sherpa_plot_func(pychips.linear_scale)
 
     plot_fit = sherpa_plot_func(SherpaUI.plot_fit)
     plot_arf = sherpa_plot_func(SherpaUI.plot_arf)
