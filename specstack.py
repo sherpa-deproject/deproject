@@ -2,13 +2,16 @@
 Manipulate a stack of spectra in Sherpa.
 
 The methods in the SpecStack class provide a way to automatically apply
-familiar Sherpa commands such as ``set_par``_ or ``freeze``_ or ``plot_fit``_
+familiar Sherpa commands such as `set_par`_ or `freeze`_ or `plot_fit`_
 to a stack of PHA spectra.  This simplifies simultaneous fitting of
 multiple spectra.
 
 Note that the :mod:`specstack` module is currently distributed within with the
 :mod:`deproject` package.  `Specstack` is not yet fully documented or tested
 outside the context of `deproject`.  
+
+:Copyright: Smithsonian Astrophysical Observatory (2009)
+:Author: Tom Aldcroft (aldcroft@head.cfa.harvard.edu)
 """
 import re
 import numpy

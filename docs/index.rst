@@ -2,45 +2,24 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-.. _`CIAO`: http://cxc.harvard.edu/ciao/
-.. _`sherpa`: http://cxc.harvard.edu/sherpa/
-.. _`XSPEC`: http://heasarc.gsfc.nasa.gov/docs/xanadu/xspec/
-.. _`projct`: https://astrophysics.gsfc.nasa.gov/XSPECwiki/projct_model
-.. _`freeze`: http://cxc.harvard.edu/sherpa/ahelp/freeze.py.html
-.. _`set_par`: http://cxc.harvard.edu/sherpa/ahelp/set_par.py.html
-.. _`set_source`: http://cxc.harvard.edu/sherpa/ahelp/set_source.py.html
-.. _`ignore`: http://cxc.harvard.edu/sherpa/ahelp/ignore.py.html
+.. include:: references.rst
 
-
-deproject
+Deproject
 ====================
-
-Overview
-----------
 
 :mod:`Deproject` is a `CIAO`_ `Sherpa`_ extension package to facilitate
 deprojection of two-dimensional annular X-ray spectra to recover the
-three-dimensional source properties.  This basic method (refs) has been
-used extensively for X-ray cluster analysis and is the basis for the `XSPEC`_
-model `projct`_.  The :mod:`deproject` module brings this functionality to
-*Sherpa* as a Python module that is straightforward to use and understand.
+three-dimensional source properties.  For typical thermal models this would
+include the radial temperature and density profiles. This basic method (refs)
+has been used extensively for X-ray cluster analysis and is the basis for the
+`XSPEC`_ model `projct`_.  The :mod:`deproject` module brings this
+functionality to *Sherpa* as a Python module that is straightforward to use and
+understand.
 
 The :mod:`deproject` module uses :mod:`specstack` to allow for manipulation of
-a stack of related input datasets and their models.  Most of the functions are
-just like ordinary *Sherpa* commands (e.g. `set_par`_, `set_source`_,
-`ignore`_) but operate on a stack of spectra.
-
-
-Download
----------
-Here is how to download
-
-Installation
--------------
-Here is how to install
-
-Concepts
------------
+a stack of related input datasets and their models.  Most of the functions
+resemble ordinary *Sherpa* commands (e.g. `set_par`_, `set_source`_, `ignore`_)
+but operate on a stack of spectra.
 
 The basic physical assumption of :mod:`deproject` is that the extended source
 emissivity is constant and optically thin within spherical shells whose radii
@@ -52,7 +31,7 @@ combination of shell models.  The geometry is illustrated in the figure below
 .. image:: geometry.png
 
 Model creation
-^^^^^^^^^^^^^^^
+----------------
 It is assumed that prior to starting :mod:`deproject` the user has extracted
 source and background spectra for each annulus.  By convention the annulus
 numbering starts from the inner radius at 0 and corresponds to the dataset
@@ -70,7 +49,7 @@ The bookkeeping required to create all the source models is handled by the
 :mod:`deproject` module.
 
 Fitting
-^^^^^^^^^^^
+-----------
 Once the composite source models for each dataset are created the fit analysis
 can begin.  Since the parameter space is typically large the usual procedure is
 to initally fit using the "onion-peeling" method:
@@ -86,7 +65,7 @@ manageable with the :mod:`specstack` methods that apply normal *Sherpa*
 commands like `freeze`_ or `set_par`_ to a stack of spectral datasets.
 
 Densities
-^^^^^^^^^^^
+------------
 Physical densities (cm^-3) for each shell can be calculated with
 :mod:`deproject` assuming the source model is based on a thermal model with the
 "standard" normalization (from the `XSPEC`_ documentation):
@@ -112,9 +91,65 @@ normalization::
 With this convention the ``volume`` used above in calculating the electron
 density for each shell is always ``v_sphere``.
 
+Download
+=========
+The :mod:`deproject` package is available for download at 
+`<http://cxc.harvard.edu/contrib/deproject/downloads>`_.
+
+Installation
+=============
+
+The :mod:`deproject` package includes three Python modules that must be made
+available to the CIAO python so that *Sherpa* can import them.  The first step
+is to untar the package tarball, change into the source directory, and initialize
+the CIAO environment::
+
+  tar zxvf deproject-<version>.tar.gz
+  cd deproject-<version>
+  source /PATH/TO/ciao/bin/ciao.csh
+
+The very simplest installation strategy is to just set the ``PYTHONPATH``
+environment variable to point to the source directory::
+
+  setenv PYTHONPATH $PWD
+
+A more robust installation option is possible if you have write access to the
+CIAO installation.  In this case enter the CIAO environment and use the CIAO
+python to install the modules into the CIAO python library::
+
+  python setup.py install
+
+If you cannot write into the CIAO python library then do the following.  The
+``INSTALL`` directory can be any convenient disk location including your home
+directory::
+
+  set INSTALL=/path/to/install
+  mkdir -p $INSTALL/lib/python
+  python setup.py install --home=$INSTALL
+  setenv PYTHONPATH $INSTALL/lib/python
+
+Test
+=======
+
+To test the installation change source distribution distribution and do the
+following::
+
+  cd examples  
+  sherpa
+  execfile('fit_m87.py')
+  plot_fit(0)
+  log_scale()
+
+This should run through in a reasonable time and produce output indicating the
+onion-peeling fit.  The plot should show a good fit.
+
 Example: M87
-------------------
-The first thing we need to do is tell *Sherpa* about the Deproject class and
+=============
+
+Now we step through the ``fit_m87.py`` script in detail to explain each step
+and illustrate how to use the :mod:`deproject` module.
+
+The first step is to tell *Sherpa* about the Deproject class and
 set a couple of constants::
 
   from deproject import Deproject
@@ -122,34 +157,39 @@ set a couple of constants::
   redshift = 0.004233                     # M87 redshift
   arcsec_per_pixel = 0.492                # ACIS plate scale
 
-Now we actually initialize the :class:`Deproject` object ``dep`` by passing a
-`numpy`_ array of the the annular radii in arcsec.  The `numpy.arange`_ method
-here returns an array from 30 to 640 in steps of 30.  These values were in
-pixels in the original spectral extraction so we convert to arcsec.  (Note the
-convenient vector multiplication that is possible with `numpy`_.)  
+Next we create a `numpy`_ array of the the annular radii in arcsec.  The
+`numpy.arange`_ method here returns an array from 30 to 640 in steps of 30.
+These values were in pixels in the original spectral extraction so we convert
+to arcsec.  (Note the convenient vector multiplication that is possible with
+`numpy`_.)  ::
+
+  radii = numpy.arange(30., 640., 30) * arcsec_per_pixel
+
+*Now the key step* of creating the :class:`Deproject` object ``dep``.  This
+object is the interface to the all the :mod:`deproject` and :mod:`specstack`
+methods used for the deprojection analysis.
+
+  dep = Deproject(radii, theta=75)
 
 In this particular analysis the spectra were extracted from a 75 degree sector
 of the annuli, hence ``theta=75`` in  the object initialization.  For the
-default case of full 360 degree annuli this is not needed.::
-
-  radii = numpy.arange(30., 640., 30) * arcsec_per_pixel
-  dep = Deproject(radii, theta=75)
+default case of full 360 degree annuli this is not needed.
 
 Now load the PHA spectral files for each annulus using the Python ``range``
 function to loop over a sequence ranging from 0 to the last annulus.  The
 ``load_pha()`` call is the first example of a :mod:`deproject` method
 (i.e. function) that mimics a *Sherpa* function with the same name.  In this
 case ``dep.load_pha(file)`` loads the PHA file using the *Sherpa* `load_pha`_
-function but also registers the dataset in the spectral stack.
+function but also registers the dataset in the spectral stack::
 
   for annulus in range(len(radii)-1):
       dep.load_pha('m87/r%dgrspec.pha' % (annulus+1))
 
 With the data loaded we set the source model for each of the spherical shells
-with the ``set_source()` method.  This is one of the more complex bits of
+with the ``set_source()`` method.  This is one of the more complex bits of
 :mod:`deproject`.  It automatically generates all the model components for each
 shell and then assigns volume-weighted linear combinations of those components
-as the source model for each of the annulus spectral datasets.::
+as the source model for each of the annulus spectral datasets::
 
   dep.set_source('xswabs * xsmekal')
 
@@ -168,6 +208,7 @@ caveats:
 
 Now the energy range used in the fitting is restricted using the stack version
 of the *Sherpa* `ignore`_ command.  The `notice`_ command is also available.
+::
 
   dep.ignore(None, 0.5)
   dep.ignore(1.8, 2.2)
@@ -175,6 +216,7 @@ of the *Sherpa* `ignore`_ command.  The `notice`_ command is also available.
 
 Next any required parameter values are set and their `freeze`_ or `thaw`_
 status are set.  
+::
 
   dep.set_par('xswabs.nh', 0.0255)
   dep.freeze("xswabs.nh")
@@ -193,6 +235,7 @@ At this point the model is completely set up and we are ready to do the initial
 issue the commands to set the optimization method, set the fit statistic, and
 configure *Sherpa* to `subtract`_ the background when doing model fitting.
 Finally the :mod:`deproject` ``fit()`` method is called to perform the fit.
+::
 
   set_method("levmar")                    # Levenberg-Marquardt optimization method
   set_stat("chi2gehrels")                 # Gehrels Chi^2 fit statistic
@@ -204,17 +247,17 @@ can be used to calculate the densities.  This is where the source angular
 diameter distance is used.  By default the angular diameter distance is
 determined with :mod:`cosmocalc` using the redshift found as a source model
 parameter.  This can be overridden in one of two ways.  First by setting the
-redshift and relying on :mod:`cosmocalc` to determine the angular size distance:
+redshift and relying on :mod:`cosmocalc` to determine the angular size distance::
 
   dep.redshift = 0.1234   # Set redshift
   print dep.angdist       # Angdist calculated using standard WMAP cosmology
 
-The second way is to explicitly set the angular size distance in cm:
+The second way is to explicitly set the angular size distance in cm::
 
   dep.angdist = 1.2345e28
 
 The electron density is then calculated with the ``get_density()`` method and
-plotted in *Sherpa*:
+plotted in *Sherpa*::
 
   density_ne = dep.get_density()
   rad_arcmin = (dep.radii[:-1] + dep.radii[1:]) / 2.0 / 60.
@@ -231,9 +274,11 @@ onion-peeling analysis by P. Nulsen using a custom perl script to generate
 `XSPEC`_ model definition and fit commands.  The agreement is good:
 
 .. image:: m87_density.png
+.. image:: m87_temperature.png
 
 Likewise the temperature profile from the :mod:`deproject` analysis matches the
 `XSPEC`_ analysis.
+::
 
   kt = dep.get_par('xsmekal.kt')   # returns array of kT values
   add_window()
@@ -241,12 +286,11 @@ Likewise the temperature profile from the :mod:`deproject` analysis matches the
   set_plot_xlabel('Radial distance (arcmin)')
   set_plot_ylabel('Density (cm^{-3})')
 
-.. image:: m87_temperature.png
 
 The unphysical temperature oscillations seen here highlights a known issue
 with this analysis method.
 
-Module documentation
+Modules
 ====================
 
 .. toctree::
@@ -255,3 +299,4 @@ Module documentation
    deproject
    specstack
    cosmocalc
+   references

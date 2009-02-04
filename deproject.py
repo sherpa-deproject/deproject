@@ -1,3 +1,9 @@
+"""
+Deproject from a set of 2-d annular spectra to the 3-d object properties.
+
+:Copyright: Smithsonian Astrophysical Observatory (2009)
+:Author: Tom Aldcroft (aldcroft@head.cfa.harvard.edu)
+"""
 import re
 from math import pi, sqrt
 import numpy
@@ -54,8 +60,8 @@ class Deproject(specstack.SpecStack):
         """
         r = self.radii
         theta_rad = self._theta / 180. * pi
-        cv = numpy.zeros([self.nshell, self.nshell])
-        v = numpy.zeros([self.nshell, self.nshell])
+        cv = numpy.zeros([self.n_datasets, self.n_datasets])
+        v = numpy.zeros([self.n_datasets, self.n_datasets])
         for a, ra0 in enumerate(r[:-1]):  # Annulus
             ra1 = r[a+1]
             for s, rs0 in enumerate(r[:-1]):  # Spherical shell
@@ -85,7 +91,7 @@ class Deproject(specstack.SpecStack):
         
         # For each shell create the corresponding model components so they can
         # be used later to create composite source models for each dataset
-        for shell in range(self.nshell):
+        for shell in range(self.n_datasets):
             for srcmodel_comp in self.srcmodel_comps:
                 model_comp = {}
                 model_comp['type'] = srcmodel_comp['type']
@@ -109,9 +115,9 @@ class Deproject(specstack.SpecStack):
 
         for dataset in self.datasets:
             dataid = dataset['id']
+            annulus = dataid
             modelexprs = []
-            annulus = dataset['annulus']
-            for shell in range(dataset['annulus'], self.nshell):
+            for shell in range(annulus, self.n_datasets):
                 srcmodel = self.srcmodel
                 for model_comp in reversed(self.srcmodel_comps):
                     i0 = model_comp['start']
@@ -147,7 +153,7 @@ class Deproject(specstack.SpecStack):
 
     def fit(self):
         """
-        Do a fit of the model parameters using the "onion-peeling" method:
+        Do a fit of the model parameters using the "onion-peeling" method:   
 
          - First fit the outside shell model using the outer annulus spectrum
          - Freeze the model parameters for the outside shell
@@ -158,8 +164,8 @@ class Deproject(specstack.SpecStack):
         :rtype: None
         """
         thawed = []                  # Parameter objects that are not already frozen
-        for annulus in reversed(range(self.nshell)):
-            dataids = [x['id'] for x in self.datasets if x['annulus'] == annulus]
+        for annulus in reversed(range(self.n_datasets)):
+            dataids = [x['id'] for x in self.datasets if x['id'] == annulus]
             print 'Fitting', dataids
             SherpaUI.fit(*dataids)
             for model_comp in self.model_comps:
@@ -210,7 +216,7 @@ class Deproject(specstack.SpecStack):
         z = self.redshift
         
         dens = []
-        for shell in range(self.nshell):
+        for shell in range(self.n_datasets):
             norm = self.find_norm(shell)
             dens.append(sqrt(norm * 4 * pi * DA_cm**2 * 1e14 * (1.0+z)**2 / volume * ne_nh_ratio))
 

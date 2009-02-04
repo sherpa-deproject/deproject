@@ -42,8 +42,26 @@ set_curve(['symbol.color', 'red', 'line.color', 'red'])
 set_plot_xlabel('Radial distance (arcmin)')
 set_plot_ylabel('Density (cm^{-3})')
 limits(X_AXIS, 0.2, 10)
-print_window('m87_density', ['format', 'png'])
+# print_window('m87_density', ['format', 'png'])
 
+# Temperature
 add_set_clear_window('temperature')
-log_scale()
+y = kt
+
+bad = nelow < 1e-4
+y_err_low = kt - ktlow
+y_err_high = kthigh - kt
+y_err_low[bad] = 0.01
+y_err_high[bad] = 0.01
+
+add_curve(x, y, [y_err_low, y_err_high, x_err, x_err])
+log_scale(X_AXIS)
+
+d_kt = dep.get_par('xsmekal.kt')
+add_curve(x, d_kt)
+set_curve(['symbol.color', 'red', 'line.color', 'red'])
+set_plot_xlabel('Radial distance (arcmin)')
+set_plot_ylabel('Temperature (keV)')
+limits(X_AXIS, 0.2, 10)
+# print_window('m87_temperature', ['format', 'png'])
 

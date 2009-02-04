@@ -1,6 +1,8 @@
 :mod:`specstack`
 ==================
 
+.. include:: references.rst
+
 .. automodule:: specstack
 
 Classes

@@ -1,16 +1,7 @@
 :mod:`deproject`
 ==================
 
-Overview
-----------
-This is the overview
-
-Download
----------
-Here is how to download
-
-Example: Temperature and density profile for M87
--------------------------------------------------
+.. include:: references.rst
 
 .. automodule:: deproject
 
