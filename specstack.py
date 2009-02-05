@@ -35,7 +35,7 @@ class SpecStack(object):
         self.srcmodel_comps = []        # Generic model components in source model expression
         self.model_comps = []           # All instantiated model components for shells
 
-    def load_pha(self, specfile, annulus=None):
+    def load_pha(self, specfile, annulus):
         """
         Load a pha file and add to the datasets for stacked analysis.
 

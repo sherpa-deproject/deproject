@@ -129,14 +129,15 @@ will get messy.
 
 **Better:**
 
-If you cannot write into the CIAO python library then do the following.  The
-``INSTALL`` directory can be any convenient disk location including your home
-directory::
+If you cannot write into the CIAO python library then do the following.  These
+commands create a python library in your home directory and install the
+``deproject`` modules there.  You could of course choose another directory
+instead of ``$HOME`` as the root of your python library.
+::
 
-  set INSTALL=/path/to/install
-  mkdir -p $INSTALL/lib/python
-  python setup.py install --home=$INSTALL
-  setenv PYTHONPATH $INSTALL/lib/python
+  mkdir -p $HOME/lib/python
+  python setup.py install --home=$HOME
+  setenv PYTHONPATH $HOME/lib/python
 
 Although you still have to set ``PYTHONPATH`` this method allows you to install
 other Python packages to the same library path.  In this way you can make a
@@ -169,12 +170,12 @@ following::
 This should run through in a reasonable time and produce output indicating the
 onion-peeling fit.  The plot should show a good fit.
 
-Example: M87
-=============
+Example: Single obsid
+========================
 
 Now we step through in detail the ``fit_m87.py`` script in the ``examples``
 directory to explain each step and illustrate how to use the :mod:`deproject`
-module.
+module.  This script should serve as the template for doing your own analysis.
 
 The first step is to tell *Sherpa* about the Deproject class and
 set a couple of constants::
@@ -223,11 +224,14 @@ Now load the PHA spectral files for each annulus using the Python ``range``
 function to loop over a sequence ranging from 0 to the last annulus.  The
 ``load_pha()`` call is the first example of a :mod:`deproject` method
 (i.e. function) that mimics a *Sherpa* function with the same name.  In this
-case ``dep.load_pha(file)`` loads the PHA file using the *Sherpa* `load_pha`_
+case ``dep.load_pha(file, annulus)`` loads the PHA file using the *Sherpa* `load_pha`_
 function but also registers the dataset in the spectral stack::
 
   for annulus in range(len(radii)-1):
-      dep.load_pha('m87/r%dgrspec.pha' % (annulus+1))
+      dep.load_pha('m87/r%dgrspec.pha' % (annulus+1), annulus)
+
+The ``annulus`` parameter is required in ``dep.load_pha()`` to support analysis
+of multi-obsid datasets.
 
 With the data loaded we set the source model for each of the spherical shells
 with the ``set_source()`` method.  This is one of the more complex bits of
@@ -329,6 +333,54 @@ directory.  The agreement is good:
 .. image:: m87_temperature.png
 
 
+Example: Multi-obsid
+==================================
+A second example illustrates the use of :mod:`deproject` for a multi-obsid
+observation of 3c186.  It also shows how to set a background model for fitting
+with the ``cstat`` statistic.  The extracted spectral data for this example are
+not yet publicly available.
+
+The script starts with some setup::
+
+  import deproject
+
+  radii = ('2.5', '6', '17')
+  dep = deproject.Deproject(radii=[float(x) for x in radii])
+
+  set_method("levmar")
+  set_stat("cstat")
+
+Now we read in the data as before with ``dep.load_pha()``.  The only difference
+here is an additional loop over the obsids.  The ``dep.load_pha()`` function
+automatically extracts the obsid from the file header.  This is used later in
+the case of setting a background model.
+::
+
+  obsids = (9407, 9774, 9775, 9408)
+  for ann in range(len(radii)-1):
+      for obsid in obsids:
+          dep.load_pha('3c186/%d/ellipse%s-%s.pi' % (obsid, radii[ann], radii[ann+1]), annulus=ann)
+
+Create and configure the source model expression as usual::
+
+  dep.set_source('xsphabs*xsapec')
+  dep.ignore(None, 0.5)
+  dep.ignore(7, None)
+  dep.freeze("xsphabs.nh")
+
+  dep.set_par('xsapec.redshift', 1.06)
+  dep.set_par('xsphabs.nh', 0.0564)
+
+Set the background model::
+
+  execfile("acis-s-bkg.py")
+  acis_s_bkg = get_bkg_source()
+  dep.set_bkg_model(acis_s_bkg)
+
+Fit the projection model::
+
+  dep.fit()
+
 Module docs
 ====================
 
@@ -339,3 +391,68 @@ Module docs
    specstack
    cosmocalc
    references
+
+To Do
+========
+
+ - Use the Python logging module to produce output and allow for a verbosity
+   setting.  [Easy]
+ - Include and document an example of deprojection with multi-obsid datasets.  [Easy]
+ - Create and use more generalized ``ModelStack`` and ``DataStack`` classes
+   to allow for general mixing models.  [Hard]
+ 
+Mixing models
+----------------------
+The source model created in :mod:`deproject` is just a special case of the
+general class of mixing models where::
+
+ source_model[i] = Sum_j(M[i,j] * model_component[j])
+ M[i,j] = mixing matrix
+
+The Sherpa model language implementation allows definition of models using
+normal python addition and multiplication operators (+ and *) on model
+component objects.  This is very powerful because it means that 
+complex models can be created using normal programming syntax.  For example::
+  
+ create_model_component('xswabs', 'gal_abs')  # galactic absorption
+ create_model_component('xszwabs', 'zabs')  # galactic absorption
+ create_model_component('xsmekal', 'mekal')  # galactic absorption
+ create_model_component('gauss1d', 'line')  # galactic absorption
+ create_model_component('gauss1d', 'line2')  # galactic absorption
+ 
+ source_intr = zabs * mekal + line
+ source_obs = gal_abs * source_intr
+
+Expanding on this and allowing for mixing via matrix multiplication, one could
+generate a cluster deprojection model that allows for variable absorption in
+each annulus with something like the following::
+
+ dep = Deproject(radii)
+ n_annuli = len(radii)-1
+ n_shell = dep.nshell
+
+ # Make a normal Sherpa absorber model called gal_abs
+ create_model_component('xswabs', 'gal_abs')  
+
+ # Make a stack of redshifted absorption models for each annulus
+ cluster_abs = ModelStack('xszwabs', n_annuli)
+ cluster_abs.redshift = 0.5
+
+ # Make a stack of thermal emission models for each shell
+ cluster_mekal = ModelStack('xsmekal', n_shell)
+ 
+ # Make the mixing model as volume normalization matrix * emission model stack
+ cluster_emission = dep.vol_norm * cluster_mekal
+
+ # Account for different absorption in each annulus by multiplying
+ # (element by element) the two ModelStacks
+ cluster_emission_absorbed = cluster_abs * cluster_emission
+
+ # Create final observed model after galactic absorption.  
+ cluster_observed = gal_abs * cluster_emission_absorbed
+
+This would make a stack of source models that can then be used to fit a stack
+of data.
+
+Full design and implementation of this concept is in work.  Interested parties
+should contact the author for updates or to provide comments.

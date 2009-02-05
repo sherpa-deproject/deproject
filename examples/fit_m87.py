@@ -9,7 +9,7 @@ dep = Deproject(radii, theta=75, angdist=angdist)
 
 # Load datasets for each annulus
 for annulus in range(len(radii)-1):
-    dep.load_pha('m87/r%dgrspec.pha' % (annulus+1))
+    dep.load_pha('m87/r%dgrspec.pha' % (annulus+1), annulus)
 
 # Subtract background
 dep.subtract()
