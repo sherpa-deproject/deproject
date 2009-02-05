@@ -114,8 +114,8 @@ the CIAO environment::
 
 There are three methods for installing.  Choose ONE of the three.
 
-Simple
--------
+**Simple:**
+
 The very simplest installation strategy is to just leave the module files in
 the source directory and set the ``PYTHONPATH`` environment variable to point
 to the source directory::
@@ -127,8 +127,8 @@ This method is fine in the short term but you always have to make sure
 start doing much with Python you will have ``PYTHONPATH`` conflicts and things
 will get messy.
 
-Better
-------
+**Better:**
+
 If you cannot write into the CIAO python library then do the following.  The
 ``INSTALL`` directory can be any convenient disk location including your home
 directory::
@@ -142,8 +142,8 @@ Although you still have to set ``PYTHONPATH`` this method allows you to install
 other Python packages to the same library path.  In this way you can make a
 local repository of packages that will run within Sherpa.
 
-Best
------
+**Best:**
+
 If you have write access to the CIAO installation you can just use the CIAO
 python to install the modules into the CIAO python library.  Assuming you are
 in the CIAO environment do::
@@ -329,7 +329,7 @@ directory.  The agreement is good:
 .. image:: m87_temperature.png
 
 
-Modules
+Module docs
 ====================
 
 .. toctree::

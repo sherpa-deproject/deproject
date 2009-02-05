@@ -7,7 +7,7 @@ install:
 	rsync -av dist/deproject-*.tar.gz examples/m87.tar.gz $(WWW)/downloads/
 
 m87tar: 
-	tar zcvf m87.tar.gz examples/m87
+	tar zcvf examples/m87.tar.gz examples/m87
 
 docs:
 	cd docs; \

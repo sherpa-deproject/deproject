@@ -35,11 +35,12 @@ class SpecStack(object):
         self.srcmodel_comps = []        # Generic model components in source model expression
         self.model_comps = []           # All instantiated model components for shells
 
-    def load_pha(self, specfile):
+    def load_pha(self, specfile, annulus=None):
         """
         Load a pha file and add to the datasets for stacked analysis.
 
         :param specfile: extracted source PHA/PI spectrum file
+        :param annulus: annulus for spectrum file
         """
         dataid = len(self.datasets)
         print 'Loading spectrum file %s as dataset id %d' % (specfile, dataid)
@@ -52,6 +53,7 @@ class SpecStack(object):
         dataset = dict(file=specfile,
                        obsid=obsid,
                        id=dataid,
+                       annulus=annulus
                        )
         self.datasets.append(dataset)
         self.obsids.add(obsid)
