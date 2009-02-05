@@ -1,6 +1,3 @@
-cosmocalc.py
-deproject.py
-specstack.py
-setup.py
-examples/fit_m87.py
-docs/*.rst
+include docs/*.rst
+include examples/*.png
+include examples/*_m87.py

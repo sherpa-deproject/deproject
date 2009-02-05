@@ -15,38 +15,44 @@ class Deproject(specstack.SpecStack):
     """
     Deproject from a set of 2-d annular spectra to the 3-d object properties.
 
+    The ``radii`` parameter must be a list of values that starts with the inner
+    radius of the inner annulus and includes each radius up through the outer
+    radius of the outer annulus.  Thus the ``radii`` list will be one element
+    longer than the number of annuli.
+
     :param radii: sorted list of circular annulus radii (arcsec) for extracted spectra
     :param theta: azimuthal extent of annuli (degrees) (default = 360)
+    :param angdist: angular size distance (cm)
     """
-    def __init__(self, radii, theta=360):
+    def __init__(self, radii, theta=360, angdist=None):
         if len(radii) < 2:
             raise ValueError('radii parameter must be a list with at least two values')
         self.radii = radii
         self.nshell = len(radii)-1
         self._theta = theta
-        self._angdist = None
+        self._angdist = angdist
         self._redshift = None
         super(Deproject, self).__init__()
 
-    def get_redshift(self):
+    def _get_redshift(self):
         if self._redshift is None:
             self._redshift = self.find_parval('redshift')
         return self._redshift
 
-    def set_redshift(self, redshift):
+    def _set_redshift(self, redshift):
         self._redshift = redshift
 
-    def get_angdist(self):
+    def _get_angdist(self):
         if self._angdist is None:
             cc = cosmocalc(self.redshift)
             self._angdist = cc['DA_cm']
         return self._angdist
 
-    def set_angdist(self, angdist):
+    def _set_angdist(self, angdist):
         self._angdist = angdist
 
-    redshift = property(get_redshift, set_redshift)
-    angdist = property(get_angdist, set_angdist)
+    redshift = property(_get_redshift, _set_redshift, None, "Source redshift")
+    angdist = property(_get_angdist, _set_angdist, None, "Angular size distance")
 
     def _calc_vol_norm(self):
         """

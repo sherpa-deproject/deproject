@@ -2,9 +2,10 @@ from deproject import Deproject
 
 redshift = 0.004233                     # M87 redshift
 arcsec_per_pixel = 0.492                # ACIS plate scale
+angdist = 4.9e25                        # M87 distance (cm) (16 Mpc)
 
 radii = numpy.arange(30., 640., 30) * arcsec_per_pixel
-dep = Deproject(radii, theta=75)
+dep = Deproject(radii, theta=75, angdist=angdist)
 
 # Load datasets for each annulus
 for annulus in range(len(radii)-1):

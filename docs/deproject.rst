@@ -12,8 +12,6 @@ Deproject class
    :show-inheritance:
    :members:
    :inherited-members:
-
-   
-
+   :undoc-members:
 
 

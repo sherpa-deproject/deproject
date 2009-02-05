@@ -1,1 +1,0 @@
-/proj/sot/ska/arch/x86_64-linux_RHFC-8/lib/python2.5/site-packages/cosmocalc.py

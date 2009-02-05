@@ -19,10 +19,10 @@ import sherpa.astro.ui as SherpaUI
 import pycrates
 import pychips
 
-def sherpa_plot_func(func):
-    def _sherpa_plot_func(self, *args, **kwargs):
+def _sherpa_plot_func(func):
+    def _sherpa_plot_func_(self, *args, **kwargs):
         self._sherpa_plot(func, *args, **kwargs)
-    return _sherpa_plot_func
+    return _sherpa_plot_func_
 
 class SpecStack(object):
     """
@@ -220,31 +220,31 @@ class SpecStack(object):
             args = tuple([args[0] + '%d']) + args[1:]
         self._sherpa_plot(pychips.plot_window, *args, **kwargs)
 
-    log_scale = sherpa_plot_func(pychips.log_scale)
-    linear_scale = sherpa_plot_func(pychips.linear_scale)
+    log_scale = _sherpa_plot_func(pychips.log_scale)
+    linear_scale = _sherpa_plot_func(pychips.linear_scale)
 
-    plot_fit = sherpa_plot_func(SherpaUI.plot_fit)
-    plot_arf = sherpa_plot_func(SherpaUI.plot_arf)
-    plot_bkg_fit = sherpa_plot_func(SherpaUI.plot_bkg_fit)
-    plot_bkg_ratio = sherpa_plot_func(SherpaUI.plot_bkg_ratio)
-    plot_chisqr = sherpa_plot_func(SherpaUI.plot_chisqr)
-    plot_fit_delchi = sherpa_plot_func(SherpaUI.plot_fit_delchi)
-    plot_psf = sherpa_plot_func(SherpaUI.plot_psf)
-    plot_bkg = sherpa_plot_func(SherpaUI.plot_bkg)
-    plot_bkg_fit_delchi = sherpa_plot_func(SherpaUI.plot_bkg_fit_delchi)
-    plot_bkg_resid = sherpa_plot_func(SherpaUI.plot_bkg_resid)
-    plot_data = sherpa_plot_func(SherpaUI.plot_data)
-    plot_fit_resid = sherpa_plot_func(SherpaUI.plot_fit_resid)
-    plot_ratio = sherpa_plot_func(SherpaUI.plot_ratio)
-    plot_bkg_chisqr = sherpa_plot_func(SherpaUI.plot_bkg_chisqr)
-    plot_bkg_fit_resid = sherpa_plot_func(SherpaUI.plot_bkg_fit_resid)
-    plot_bkg_source = sherpa_plot_func(SherpaUI.plot_bkg_source)
-    plot_delchi = sherpa_plot_func(SherpaUI.plot_delchi)
-    plot_model = sherpa_plot_func(SherpaUI.plot_model)
-    plot_resid = sherpa_plot_func(SherpaUI.plot_resid)
-    plot_bkg_delchi = sherpa_plot_func(SherpaUI.plot_bkg_delchi)
-    plot_bkg_model = sherpa_plot_func(SherpaUI.plot_bkg_model)
-    plot_bkg_unconvolved = sherpa_plot_func(SherpaUI.plot_bkg_unconvolved)
-    plot_fit = sherpa_plot_func(SherpaUI.plot_fit)
-    plot_order = sherpa_plot_func(SherpaUI.plot_order)
-    plot_source = sherpa_plot_func(SherpaUI.plot_source)
+    plot_fit = _sherpa_plot_func(SherpaUI.plot_fit)
+    plot_arf = _sherpa_plot_func(SherpaUI.plot_arf)
+    plot_bkg_fit = _sherpa_plot_func(SherpaUI.plot_bkg_fit)
+    plot_bkg_ratio = _sherpa_plot_func(SherpaUI.plot_bkg_ratio)
+    plot_chisqr = _sherpa_plot_func(SherpaUI.plot_chisqr)
+    plot_fit_delchi = _sherpa_plot_func(SherpaUI.plot_fit_delchi)
+    plot_psf = _sherpa_plot_func(SherpaUI.plot_psf)
+    plot_bkg = _sherpa_plot_func(SherpaUI.plot_bkg)
+    plot_bkg_fit_delchi = _sherpa_plot_func(SherpaUI.plot_bkg_fit_delchi)
+    plot_bkg_resid = _sherpa_plot_func(SherpaUI.plot_bkg_resid)
+    plot_data = _sherpa_plot_func(SherpaUI.plot_data)
+    plot_fit_resid = _sherpa_plot_func(SherpaUI.plot_fit_resid)
+    plot_ratio = _sherpa_plot_func(SherpaUI.plot_ratio)
+    plot_bkg_chisqr = _sherpa_plot_func(SherpaUI.plot_bkg_chisqr)
+    plot_bkg_fit_resid = _sherpa_plot_func(SherpaUI.plot_bkg_fit_resid)
+    plot_bkg_source = _sherpa_plot_func(SherpaUI.plot_bkg_source)
+    plot_delchi = _sherpa_plot_func(SherpaUI.plot_delchi)
+    plot_model = _sherpa_plot_func(SherpaUI.plot_model)
+    plot_resid = _sherpa_plot_func(SherpaUI.plot_resid)
+    plot_bkg_delchi = _sherpa_plot_func(SherpaUI.plot_bkg_delchi)
+    plot_bkg_model = _sherpa_plot_func(SherpaUI.plot_bkg_model)
+    plot_bkg_unconvolved = _sherpa_plot_func(SherpaUI.plot_bkg_unconvolved)
+    plot_fit = _sherpa_plot_func(SherpaUI.plot_fit)
+    plot_order = _sherpa_plot_func(SherpaUI.plot_order)
+    plot_source = _sherpa_plot_func(SherpaUI.plot_source)

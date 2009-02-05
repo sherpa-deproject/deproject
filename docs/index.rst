@@ -93,8 +93,11 @@ density for each shell is always ``v_sphere``.
 
 Download
 =========
-The :mod:`deproject` package is available for download at 
-`<http://cxc.harvard.edu/contrib/deproject/downloads>`_.
+
+The :mod:`deproject` package is available for
+download at `<http://cxc.harvard.edu/contrib/deproject/downloads>`_.  That
+directory also contains the M87 data (``m87.tar.gz``) needed to run the example
+analysis.  
 
 Installation
 =============
@@ -106,19 +109,26 @@ the CIAO environment::
 
   tar zxvf deproject-<version>.tar.gz
   cd deproject-<version>
+  tar zxvf m87.tar.gz               # Needed for example / test script
   source /PATH/TO/ciao/bin/ciao.csh
 
-The very simplest installation strategy is to just set the ``PYTHONPATH``
-environment variable to point to the source directory::
+There are three methods for installing.  Choose ONE of the three.
+
+Simple
+-------
+The very simplest installation strategy is to just leave the module files in
+the source directory and set the ``PYTHONPATH`` environment variable to point
+to the source directory::
 
   setenv PYTHONPATH $PWD
 
-A more robust installation option is possible if you have write access to the
-CIAO installation.  In this case enter the CIAO environment and use the CIAO
-python to install the modules into the CIAO python library::
+This method is fine in the short term but you always have to make sure
+``PYTHONPATH`` is set appropriately (perhaps in your ~/.cshrc file).  And if you
+start doing much with Python you will have ``PYTHONPATH`` conflicts and things
+will get messy.
 
-  python setup.py install
-
+Better
+------
 If you cannot write into the CIAO python library then do the following.  The
 ``INSTALL`` directory can be any convenient disk location including your home
 directory::
@@ -128,10 +138,26 @@ directory::
   python setup.py install --home=$INSTALL
   setenv PYTHONPATH $INSTALL/lib/python
 
+Although you still have to set ``PYTHONPATH`` this method allows you to install
+other Python packages to the same library path.  In this way you can make a
+local repository of packages that will run within Sherpa.
+
+Best
+-----
+If you have write access to the CIAO installation you can just use the CIAO
+python to install the modules into the CIAO python library.  Assuming you are
+in the CIAO environment do::
+
+  python setup.py install
+
+This puts the new modules straight in to the CIAO python library so that any time
+you enter the CIAO environment they will be available.  You do NOT need to set
+``PYTHONPATH``.
+
 Test
 =======
 
-To test the installation change source distribution distribution and do the
+To test the installation change to the source distribution directory and do the
 following::
 
   cd examples  
@@ -146,8 +172,9 @@ onion-peeling fit.  The plot should show a good fit.
 Example: M87
 =============
 
-Now we step through the ``fit_m87.py`` script in detail to explain each step
-and illustrate how to use the :mod:`deproject` module.
+Now we step through in detail the ``fit_m87.py`` script in the ``examples``
+directory to explain each step and illustrate how to use the :mod:`deproject`
+module.
 
 The first step is to tell *Sherpa* about the Deproject class and
 set a couple of constants::
@@ -156,6 +183,7 @@ set a couple of constants::
 
   redshift = 0.004233                     # M87 redshift
   arcsec_per_pixel = 0.492                # ACIS plate scale
+  angdist = 4.9e25                        # M87 distance (cm) (16 Mpc)
 
 Next we create a `numpy`_ array of the the annular radii in arcsec.  The
 `numpy.arange`_ method here returns an array from 30 to 640 in steps of 30.
@@ -165,15 +193,31 @@ to arcsec.  (Note the convenient vector multiplication that is possible with
 
   radii = numpy.arange(30., 640., 30) * arcsec_per_pixel
 
-*Now the key step* of creating the :class:`Deproject` object ``dep``.  This
-object is the interface to the all the :mod:`deproject` and :mod:`specstack`
-methods used for the deprojection analysis.
+The ``radii`` parameter must be a list of values that starts with the inner
+radius of the inner annulus and includes each radius up through the outer
+radius of the outer annulus.  Thus the ``radii`` list will be one element
+longer than the number of annuli.
 
-  dep = Deproject(radii, theta=75)
+*Now the key step* of creating the :class:`Deproject` object ``dep``.  This
+object is the interface to the all the :mod:`deproject`
+methods used for the deprojection analysis.  
+::
+
+  dep = Deproject(radii, theta=75, angdist=angdist)
+
+If you are not familiar with object oriented programming, the ``dep`` object is
+just a thingy that stores all the information about the deprojection analysis
+(e.g. the source redshift, PHA file information and the source model
+definitions) as object *attributes*.  It also has object *methods*
+(i.e. functions) you can call such as ``dep.get_par(parname)`` or
+``dep.load_pha(file)``.  The full list of attributes and methods are in the
+:mod:`deproject` module documentation.
 
 In this particular analysis the spectra were extracted from a 75 degree sector
-of the annuli, hence ``theta=75`` in  the object initialization.  For the
-default case of full 360 degree annuli this is not needed.
+of the annuli, hence ``theta=75`` in the object initialization.  For the
+default case of full 360 degree annuli this is not needed.  Because the
+redshift is not a good distance estimator for M87 we also explicitly set the
+angular size distance.
 
 Now load the PHA spectral files for each annulus using the Python ``range``
 function to loop over a sequence ranging from 0 to the last annulus.  The
@@ -244,17 +288,12 @@ Finally the :mod:`deproject` ``fit()`` method is called to perform the fit.
 
 After the fit process each shell model has an association normalization that
 can be used to calculate the densities.  This is where the source angular
-diameter distance is used.  By default the angular diameter distance is
-determined with :mod:`cosmocalc` using the redshift found as a source model
-parameter.  This can be overridden in one of two ways.  First by setting the
-redshift and relying on :mod:`cosmocalc` to determine the angular size distance::
+diameter distance is used.  If the angular diameter distance is not set
+explicitly in the original ``dep = Deproject(...)`` command then it is
+calculated automatically from the redshift found as a source model
+parameter.  One can examine the values being used as follows::
 
-  dep.redshift = 0.1234   # Set redshift
-  print dep.angdist       # Angdist calculated using standard WMAP cosmology
-
-The second way is to explicitly set the angular size distance in cm::
-
-  dep.angdist = 1.2345e28
+  print "z=%.5f angdist=%.2e cm" % (dep.redshift, dep.angdist)
 
 The electron density is then calculated with the ``get_density()`` method and
 plotted in *Sherpa*::
@@ -266,19 +305,10 @@ plotted in *Sherpa*::
   set_plot_xlabel('Radial distance (arcmin)')
   set_plot_ylabel('Density (cm^{-3})')
   limits(X_AXIS, 0.2, 10)
+  log_scale()
   print_window('m87_density', ['format', 'png'])
 
-In the image below the density computed with :mod:`deproject` is plotted in
-red.  The white curve shows the density determined with an independent
-onion-peeling analysis by P. Nulsen using a custom perl script to generate
-`XSPEC`_ model definition and fit commands.  The agreement is good:
-
-.. image:: m87_density.png
-.. image:: m87_temperature.png
-
-Likewise the temperature profile from the :mod:`deproject` analysis matches the
-`XSPEC`_ analysis.
-::
+The temperature profile from the :mod:`deproject` can be plotted as follows::
 
   kt = dep.get_par('xsmekal.kt')   # returns array of kT values
   add_window()
@@ -286,9 +316,18 @@ Likewise the temperature profile from the :mod:`deproject` analysis matches the
   set_plot_xlabel('Radial distance (arcmin)')
   set_plot_ylabel('Density (cm^{-3})')
 
-
 The unphysical temperature oscillations seen here highlights a known issue
 with this analysis method.
+
+In the images below the :mod:`deproject` results (red) are compared with values
+(black) from an independent onion-peeling analysis by P. Nulsen using a custom
+perl script to generate `XSPEC`_ model definition and fit commands.  These
+plots were created with the ``plot_m87.py`` script in the ``examples``
+directory.  The agreement is good:
+
+.. image:: m87_density.png
+.. image:: m87_temperature.png
+
 
 Modules
 ====================
