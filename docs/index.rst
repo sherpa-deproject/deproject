@@ -108,8 +108,8 @@ is to untar the package tarball, change into the source directory, and initializ
 the CIAO environment::
 
   tar zxvf deproject-<version>.tar.gz
+  tar zxvf m87.tar.gz -C deproject-<version>/examples   # Needed for example / test script
   cd deproject-<version>
-  tar zxvf m87.tar.gz               # Needed for example / test script
   source /PATH/TO/ciao/bin/ciao.csh
 
 There are three methods for installing.  Choose ONE of the three.
@@ -170,12 +170,20 @@ following::
 This should run through in a reasonable time and produce output indicating the
 onion-peeling fit.  The plot should show a good fit.
 
-Example: Single obsid
+Example: M87
 ========================
 
 Now we step through in detail the ``fit_m87.py`` script in the ``examples``
 directory to explain each step and illustrate how to use the :mod:`deproject`
 module.  This script should serve as the template for doing your own analysis.
+
+This example uses extracted spectra, response products, and analysis results
+for the Chandra observation of M87 (obsid 2707).  These were kindly provided by Paul
+Nulsen.  Results based on this observation can be found in `Forman et al 2005`_
+and via the CXC Archive `Obsid 2707 Publications`_ list.
+
+.. _`Forman et al 2005`: http://adsabs.harvard.edu/abs/2005ApJ...635..894F
+.. _`Obsid 2707 Publications`: http://cda.harvard.edu/chaser/viewerContents.do?obsid=2707&operation=ads
 
 The first step is to tell *Sherpa* about the Deproject class and
 set a couple of constants::
@@ -381,17 +389,6 @@ Fit the projection model::
 
   dep.fit()
 
-Module docs
-====================
-
-.. toctree::
-   :maxdepth: 2
-
-   deproject
-   specstack
-   cosmocalc
-   references
-
 To Do
 ========
 
@@ -456,3 +453,15 @@ of data.
 
 Full design and implementation of this concept is in work.  Interested parties
 should contact the author for updates or to provide comments.
+
+Module docs
+====================
+
+.. toctree::
+   :maxdepth: 2
+
+   deproject
+   specstack
+   cosmocalc
+   references
+

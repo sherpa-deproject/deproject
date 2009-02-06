@@ -4,49 +4,7 @@ Calculate useful values for a given cosmology.  This module uses code adapted
 from `CC.py`_ (`James Schombert`_) which is a Python version of the
 `Cosmology Calculator`_ (`Ned Wright`_).
 
-This module provides both a command line and a python function interface::
-
-   % cosmocalc.py --H0 75 1.25 DA_cm DL_cm
-   DA_cm = 5.05917680921e+27
-   DL_cm = 2.56120825966e+28
-
-   % python
-   >>> from cosmocalc import cosmocalc
-   >>> ccvals = cosmocalc(3.2, H0=71)
-   >>> print ccvals['DL_cm'], ccvals['age_Gyr']
-   8.62139764564e+28 13.6653103344
-
-.. _`James Schombert`: http://abyss.uoregon.edu/~js/
-.. _`CC.py`: http://www.astro.ucla.edu/~wright/CC.python
-.. _`Ned Wright`: http://www.astro.ucla.edu/~wright/intro.html
-.. _`Cosmology Calculator`: http://www.astro.ucla.edu/~wright/CosmoCalc.html
-
-:Copyright: Smithsonian Astrophysical Observatory (2009)
-:Author: Tom Aldcroft (aldcroft@head.cfa.harvard.edu)
-"""
-
-import math
-import textwrap
-
-# Define a few constants
-cm_per_pc = 3.0856775813057289536e+18 
-c = 299792.458                         # velocity of light in km/sec
-km_per_ly = 3600*24*365.25*c           # km per light-year
-Tyr = 977.8                            # coefficent for converting 1/H into Gyr
-arcsec_per_rad = 206264.806
-_outvals = ('DA DA_Gyr DA_Mpc DA_cm',
-            'DL DL_Gyr DL_Mpc DL_cm',
-            'DCMR DCMR_Gyr DCMR_Mpc DCMR_cm',
-            'PS_kpc PS_cm',
-            'DTT DTT_Gyr',
-            'VCM VCM_Gpc3',
-            'age age_Gyr',
-            'zage zage_Gyr',
-            'H0 WM WV WK WR z')
-
-def cosmocalc(z, H0=71, WM=0.27, WV=None):
-    """
-    Calculate useful values for the supplied cosmology.
+The following values are calculated:
 
     ====  ===================================  ===========
     Name  Value                                Units
@@ -66,6 +24,38 @@ def cosmocalc(z, H0=71, WM=0.27, WV=None):
     DL    Luminosity distance                  Gyr Mpc cm
     PS    Plate scale - distance per arcsec    kpc cm
     ====  ===================================  ===========
+
+.. _`James Schombert`: http://abyss.uoregon.edu/~js/
+.. _`CC.py`: http://www.astro.ucla.edu/~wright/CC.python
+.. _`Ned Wright`: http://www.astro.ucla.edu/~wright/intro.html
+.. _`Cosmology Calculator`: http://www.astro.ucla.edu/~wright/CosmoCalc.html
+
+:Copyright: Smithsonian Astrophysical Observatory (2009)
+:Author: Tom Aldcroft (aldcroft@head.cfa.harvard.edu)
+"""
+
+import math
+
+# Define a few constants
+cm_per_pc = 3.0856775813057289536e+18 
+c = 299792.458                         # velocity of light in km/sec
+km_per_ly = 3600*24*365.25*c           # km per light-year
+Tyr = 977.8                            # coefficent for converting 1/H into Gyr
+arcsec_per_rad = 206264.806
+_outvals_str = ('z H0 WM WV WK WR',
+                'DA DA_Gyr DA_Mpc DA_cm',
+                'DL DL_Gyr DL_Mpc DL_cm',
+                'DCMR DCMR_Gyr DCMR_Mpc DCMR_cm',
+                'PS_kpc PS_cm',
+                'DTT DTT_Gyr',
+                'VCM VCM_Gpc3',
+                'age age_Gyr',
+                'zage zage_Gyr',)
+_outvals = (' '.join(_outvals_str)).split()
+
+def cosmocalc(z, H0=71, WM=0.27, WV=None):
+    """
+    Calculate useful values for the supplied cosmology.
 
     This routine returns a dictionary of values in the form ``<name>: <value>``,
     where the values are supplied in "natural" units for cosmology, e.g. 1/H0.
@@ -156,7 +146,7 @@ def cosmocalc(z, H0=71, WM=0.27, WV=None):
     x = math.sqrt(abs(WK)) * DCMR
     if x > 0.1:
         if WK > 0:
-            ratio =  0.5 * (exp(x) - exp(-x)) / x 
+            ratio =  0.5 * (math.exp(x) - math.exp(-x)) / x 
         else:
             ratio = math.math.sin(x) / x
     else:
@@ -209,28 +199,28 @@ def cosmocalc(z, H0=71, WM=0.27, WV=None):
     PS_cm = PS_kpc * cm_per_pc * 1000
 
     localvals = locals()
-    outvals = (' '.join(_outvals)).split()
-    return dict((x, localvals[x]) for x in outvals)
+    return dict((x, localvals[x]) for x in _outvals)
 
 def get_options():
+    """
+    cosmocalc.py [options] redshift [name_unit [name_unit2 ...]]
+
+    Allowed ``name_unit`` values::
+
+      DA DA_Gyr DA_Mpc DA_cm
+      DL DL_Gyr DL_Mpc DL_cm
+      DCMR DCMR_Gyr DCMR_Mpc DCMR_cm
+      PS_kpc PS_cm
+      DTT DTT_Gyr
+      VCM VCM_Gpc3
+      age age_Gyr
+      zage zage_Gyr
+      H0 WM WV WK WR z
+
+    If no ``name_unit`` values are supplied then all the above will be printed."""
     from optparse import OptionParser
-    usage = """\
-    %%prog [options] redshift name_unit [name_unit2 ...]
 
-    Allowed output values:
-     %s
-
-    Example::
-
-     % cosmocalc.py --H0 75 1.25 DA_cm DL_cm
-     DA_cm = 5.05917680921e+27
-     DL_cm = 2.56120825966e+28
-
-     % pydoc ./cosmocalc.py
-     
-    See also the cosmocalc function documentation for details""" % '\n     '.join(_outvals)
-
-    parser = OptionParser(textwrap.dedent(usage))
+    parser = OptionParser(get_options.__doc__)
     parser.set_defaults()
     parser.add_option("--H0",
                       default=None,
@@ -250,15 +240,15 @@ def get_options():
 def main():
     opt, args, parser = get_options()
 
-    if len(args) < 2:
-        parser.error('Need a redshift and name_unit')
+    if len(args) < 1:
+        parser.error('Need a redshift')
 
     kwargs = dict((key, val) for (key, val) in opt.__dict__.items() if val is not None)
     z = float(args[0])
     cc = cosmocalc(z, **kwargs)
     try:
         outlines = []
-        for outkey in args[1:]:
+        for outkey in (args[1:] or _outvals):
             outlines.append(outkey + ' = ' + str(cc[outkey]))
         print '\n'.join(outlines)
     except KeyError:

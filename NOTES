@@ -1,2 +1,10 @@
+Path setup for deproject development
+
+ciao
+setenv PATH "/home/aldcroft/ciaopy/bin:$PATH"
+setenv PYTHONPATH "$PWD:/home/aldcroft/ciaopy/lib/python"
+
+Refs:
+
 2005 forman nulsen => references wilson 
 obsid 2707 (?)
