@@ -10,7 +10,7 @@ Deproject
 :mod:`Deproject` is a `CIAO`_ `Sherpa`_ extension package to facilitate
 deprojection of two-dimensional annular X-ray spectra to recover the
 three-dimensional source properties.  For typical thermal models this would
-include the radial temperature and density profiles. This basic method (refs)
+include the radial temperature and density profiles. This basic method 
 has been used extensively for X-ray cluster analysis and is the basis for the
 `XSPEC`_ model `projct`_.  The :mod:`deproject` module brings this
 functionality to *Sherpa* as a Python module that is straightforward to use and
@@ -394,66 +394,9 @@ To Do
 
  - Use the Python logging module to produce output and allow for a verbosity
    setting.  [Easy]
- - Include and document an example of deprojection with multi-obsid datasets.  [Easy]
  - Create and use more generalized ``ModelStack`` and ``DataStack`` classes
    to allow for general mixing models.  [Hard]
  
-Mixing models
-----------------------
-The source model created in :mod:`deproject` is just a special case of the
-general class of mixing models where::
-
- source_model[i] = Sum_j(M[i,j] * model_component[j])
- M[i,j] = mixing matrix
-
-The Sherpa model language implementation allows definition of models using
-normal python addition and multiplication operators (+ and *) on model
-component objects.  This is very powerful because it means that 
-complex models can be created using normal programming syntax.  For example::
-  
- create_model_component('xswabs', 'gal_abs')  # galactic absorption
- create_model_component('xszwabs', 'zabs')  # galactic absorption
- create_model_component('xsmekal', 'mekal')  # galactic absorption
- create_model_component('gauss1d', 'line')  # galactic absorption
- create_model_component('gauss1d', 'line2')  # galactic absorption
- 
- source_intr = zabs * mekal + line
- source_obs = gal_abs * source_intr
-
-Expanding on this and allowing for mixing via matrix multiplication, one could
-generate a cluster deprojection model that allows for variable absorption in
-each annulus with something like the following::
-
- dep = Deproject(radii)
- n_annuli = len(radii)-1
- n_shell = dep.nshell
-
- # Make a normal Sherpa absorber model called gal_abs
- create_model_component('xswabs', 'gal_abs')  
-
- # Make a stack of redshifted absorption models for each annulus
- cluster_abs = ModelStack('xszwabs', n_annuli)
- cluster_abs.redshift = 0.5
-
- # Make a stack of thermal emission models for each shell
- cluster_mekal = ModelStack('xsmekal', n_shell)
- 
- # Make the mixing model as volume normalization matrix * emission model stack
- cluster_emission = dep.vol_norm * cluster_mekal
-
- # Account for different absorption in each annulus by multiplying
- # (element by element) the two ModelStacks
- cluster_emission_absorbed = cluster_abs * cluster_emission
-
- # Create final observed model after galactic absorption.  
- cluster_observed = gal_abs * cluster_emission_absorbed
-
-This would make a stack of source models that can then be used to fit a stack
-of data.
-
-Full design and implementation of this concept is in work.  Interested parties
-should contact the author for updates or to provide comments.
-
 Module docs
 ====================
 
