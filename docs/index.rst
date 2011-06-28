@@ -74,7 +74,7 @@ Physical densities (cm^-3) for each shell can be calculated with
 
 Inverting this equation and assuming a constant ratio of N_H to electrons::
 
- n_e = sqrt(norm * 4*pi * DA^2 * 1e14 * (1+z)^2 / volume * ne_nh_ratio))
+ n_e = sqrt(norm * 4*pi * DA^2 * 1e14 * (1+z)^2 / (volume * ne_nh_ratio))
 
  norm        = model normalization from Sherpa fit
  DA          = angular size distance (cm)

@@ -1,4 +1,4 @@
-WWW = /proj/web-cxc/htdocs/contrib/deproject
+WWW = /proj/web-cxc-dmz/htdocs/contrib/deproject
 
 .PHONY: m87tar docs dist
 
