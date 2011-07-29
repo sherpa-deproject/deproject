@@ -16,8 +16,12 @@ outside the context of `deproject`.
 import re
 import numpy
 import sherpa.astro.ui as SherpaUI
-import pycrates
-import pychips
+try:
+    import pycrates
+    import pychips
+except ImportError:
+    # Allow doc generation to work without pychips and pycrates
+    print "ERROR: could not import pycrates and pychips"
 
 def _sherpa_plot_func(func):
     def _sherpa_plot_func_(self, *args, **kwargs):
@@ -48,7 +52,7 @@ class SpecStack(object):
 
         try:
             obsid = int(pycrates.read_file(specfile).get_key_value('OBS_ID'))
-        except TypeError:
+        except (TypeError, ValueError):
             obsid = 0
         dataset = dict(file=specfile,
                        obsid=obsid,
@@ -222,8 +226,16 @@ class SpecStack(object):
             args = tuple([args[0] + '%d']) + args[1:]
         self._sherpa_plot(pychips.plot_window, *args, **kwargs)
 
-    log_scale = _sherpa_plot_func(pychips.log_scale)
-    linear_scale = _sherpa_plot_func(pychips.linear_scale)
+    def dummyfunc(self, *args, **kwargs):
+        pass
+
+    try:
+        log_scale = _sherpa_plot_func(pychips.log_scale)
+        linear_scale = _sherpa_plot_func(pychips.linear_scale)
+    except NameError:
+        # Allow doc generation to work without pychips
+        log_scale = dummyfunc
+        linear_scale = dummyfunc
 
     plot_fit = _sherpa_plot_func(SherpaUI.plot_fit)
     plot_arf = _sherpa_plot_func(SherpaUI.plot_arf)
@@ -251,3 +263,4 @@ class SpecStack(object):
     plot_fit = _sherpa_plot_func(SherpaUI.plot_fit)
     plot_order = _sherpa_plot_func(SherpaUI.plot_order)
     plot_source = _sherpa_plot_func(SherpaUI.plot_source)
+
