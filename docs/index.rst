@@ -94,10 +94,9 @@ density for each shell is always ``v_sphere``.
 Download
 =========
 
-The :mod:`deproject` package is available for
-download at `<http://cxc.harvard.edu/contrib/deproject/downloads>`_.  That
-directory also contains the M87 data (``m87.tar.gz``) needed to run the example
-analysis.  
+The :mod:`deproject` package is available for download at `deproject.tar.gz
+<downloads/deproject.tar.gz>`_.  The M87 data needed to run the example
+analysis is available as `m87.tar.gz <downloads/m87.tar.gz>`_
 
 Installation
 =============

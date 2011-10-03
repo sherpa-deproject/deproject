@@ -258,7 +258,11 @@ class SpecStack(object):
     plot_resid = _sherpa_plot_func(SherpaUI.plot_resid)
     plot_bkg_delchi = _sherpa_plot_func(SherpaUI.plot_bkg_delchi)
     plot_bkg_model = _sherpa_plot_func(SherpaUI.plot_bkg_model)
-    plot_bkg_unconvolved = _sherpa_plot_func(SherpaUI.plot_bkg_source)
+    # CIAO 4.3 re-named plot_bkg_unconvolved to plot_bkg_source
+    if hasattr(SherpaUI, "plot_bkg_unconvolved"):
+        plot_bkg_unconvolved = _sherpa_plot_func(SherpaUI.plot_bkg_unconvolved)
+    else:
+        plot_bkg_unconvolved = _sherpa_plot_func(SherpaUI.plot_bkg_source)
     plot_bkg_source = _sherpa_plot_func(SherpaUI.plot_bkg_source)
     plot_fit = _sherpa_plot_func(SherpaUI.plot_fit)
     plot_order = _sherpa_plot_func(SherpaUI.plot_order)

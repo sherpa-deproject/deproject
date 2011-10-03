@@ -1,6 +1,6 @@
 from distutils.core import setup
 setup(name='deproject',
-      version='0.1.2',
+      version='0.1.3',
       description='Sherpa deprojection extension package',
       author='Tom Aldcroft',
       url='http://cxc.harvard.edu/contrib/deproject/',
