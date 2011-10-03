@@ -98,6 +98,8 @@ The :mod:`deproject` package is available for download at `deproject.tar.gz
 <downloads/deproject.tar.gz>`_.  The M87 data needed to run the example
 analysis is available as `m87.tar.gz <downloads/m87.tar.gz>`_
 
+The source is available on github at `<https://github.com/taldcroft/deproject>`_.
+
 Installation
 =============
 
