@@ -228,3 +228,44 @@ class Deproject(specstack.SpecStack):
 
         return numpy.array(dens)
 
+    def conf(self):
+        """
+        Run conf on each of the model parameters using the "onion-peeling" method:   
+
+         - First conf the outside shell model using the outer annulus spectrum
+         - Freeze the model parameters for the outside shell
+         - get confidences for the next inward shell / annulus and freeze those parameters
+         - Repeat until all datasets have been conf()-ed and all shell-by-shell error parameters determined.
+         - Return model parameters to original thawed/frozen status
+         - WARNING: This ignores the correlations between parameters
+
+        :rtype: None
+        """
+        thawed = []                  # Parameter objects that are not already frozen
+        conf_results = []
+        this_conf_result = []
+        for annulus in reversed(range(self.nshell)):
+            dataids = [x['id'] for x in self.datasets if x['annulus'] == annulus]
+            print 'Getting shell-by-shell confidence for dataset ', dataids
+            SherpaUI.conf(*dataids)
+            this_conf_result = SherpaUI.get_conf_results()
+            conf_results.append(this_conf_result)
+            # get_conf_results().parmins,parmaxes,parnames,parvals
+            for model_comp in self.model_comps:
+                name = model_comp['name']
+                if model_comp['shell'] == annulus:
+                    # Remember parameters that are currently thawed
+                    for par in [SherpaUI.get_par('%s.%s'%(name, x))
+                                for x in SherpaUI.get_model_pars(name)]:
+                        if not par.frozen:
+                            thawed.append(par)
+                    print 'Freezing', model_comp['name']
+                    SherpaUI.freeze(model_comp['name'])
+
+        # Unfreeze parameters
+        for par in thawed:
+            print 'Thawing', par.fullname
+            par.thaw()
+            
+        return conf_results
+
