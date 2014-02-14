@@ -249,8 +249,7 @@ class Deproject(specstack.SpecStack):
             print 'Getting shell-by-shell confidence for dataset ', dataids
             SherpaUI.conf(*dataids)
             this_conf_result = SherpaUI.get_conf_results()
-            conf_results.append(this_conf_result)
-            # get_conf_results().parmins,parmaxes,parnames,parvals
+            conf_results.insert(0, this_conf_result)
             for model_comp in self.model_comps:
                 name = model_comp['name']
                 if model_comp['shell'] == annulus:
