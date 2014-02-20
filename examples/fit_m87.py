@@ -1,8 +1,15 @@
 from deproject import Deproject
 
+import logging
+logger = logging.getLogger("sherpa")
+logging.basicConfig(level=logging.INFO, filename="deproject.log", filemode="w")
+
+import numpy
+
 redshift = 0.004233                     # M87 redshift
 arcsec_per_pixel = 0.492                # ACIS plate scale
 angdist = 4.9e25                        # M87 distance (cm) (16 Mpc)
+mue=1.18;
 
 radii = numpy.arange(30., 640., 30) * arcsec_per_pixel
 dep = Deproject(radii, theta=75, angdist=angdist)
@@ -35,4 +42,5 @@ dep.set_par('xsmekal.redshift', redshift)
 set_method("levmar")                    # Levenberg-Marquardt optimization method
 set_stat("chi2gehrels")                 # Gehrels Chi^2 fit statistic
 dep.fit()
-
+#fit()
+conf_params = dep.conf()
