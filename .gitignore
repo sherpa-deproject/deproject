@@ -1,0 +1,13 @@
+*~
+
+examples/m87
+dist
+docs/_build
+**/api
+
+build
+__pycache__
+.cache/
+
+deproject.egg-info
+.eggs
