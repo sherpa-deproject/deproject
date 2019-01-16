@@ -1,7 +1,8 @@
 import deproject
+from astropy import units as u
 
 radii = ('2.5', '6', '17')
-dep = deproject.Deproject(radii=[float(x) for x in radii])
+dep = deproject.Deproject(radii=[float(x) for x in radii] * u.arcsec)
 
 set_method("neldermead")
 set_method("levmar")
