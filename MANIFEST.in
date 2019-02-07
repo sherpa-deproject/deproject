@@ -1,5 +1,2 @@
-include docs/*.rst
-include examples/*.png
-include examples/*_m87.py
-include examples/acis-s-bkg.py
-include examples/fit_3c186.py
+include README.rst
+include LICENSE

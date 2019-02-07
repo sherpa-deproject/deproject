@@ -1,5 +1,5 @@
 Deproject
-====================
+=========
 
 ``Deproject`` is a CIAO Sherpa extension package to facilitate
 deprojection of two-dimensional annular X-ray spectra to recover the
@@ -15,3 +15,11 @@ emissivity is constant and optically thin within spherical shells whose radii
 correspond to the annuli used to extract the specta.  Given this assumption one
 constructs a model for each annular spectrum that is a linear volume-weighted
 combination of shell models.
+
+License
+-------
+
+The ``deproject`` module is released under the
+`BSD 2-Clause license <https://choosealicense.com/licenses/bsd-2-clause/>`_,
+available as the file ``LICENSE`` in the source distribution.
+
