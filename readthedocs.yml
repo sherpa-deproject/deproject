@@ -1,0 +1,13 @@
+
+# requirements_file: docs/rtd-pip-requirements
+
+# Use Python 3.5 since this is what is used by CIAO
+#
+python:
+   version: 3.5
+   setup_py_install: true
+   # use_system_site_packages: true
+
+conda:
+   file: rtd-environment.yml
+   
