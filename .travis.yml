@@ -1,0 +1,37 @@
+# Based on
+# https://github.com/astrofrog/example-travis-conda/blob/master/.travis.yml
+# but all problems are mine
+#
+
+dist: xenial
+
+language: python
+
+matrix:
+  include:
+    - python: 3.7
+      env: NUMPY=1.15
+
+before_install:
+  - wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda3.sh
+  - chmod +x miniconda3.sh
+  - ./miniconda3.sh -b -p /home/travis/miniconda
+  - export PATH=/home/travis/miniconda/bin:$PATH
+  - conda update --yes conda
+
+  # DEBUG information
+  - conda info -a
+  - python --version
+ 
+install:
+  - conda create --yes -n test python=$TRAVIS_PYTHON_VERSION
+  # - conda activate test
+  - source activate test
+  - conda install --yes numpy=$NUMPY pytest
+  - conda install --yes -c sherpa sherpa
+
+  # I guess we should actually install the software!
+  - pip install .
+
+script:
+  - py.test
