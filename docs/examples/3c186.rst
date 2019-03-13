@@ -1,0 +1,56 @@
+
+.. include:: ../references.rst
+
+Multiple datasets per annulus (3C186)
+=====================================
+
+A second example illustrates the use of :mod:`deproject` for a multi-obsid
+observation of 3C186.  It also shows how to set a background model for fitting
+with the ``cstat`` statistic.  The extracted spectral data for this example are
+not yet publicly available, but were used in `Siemiginowska et al. 2010`_:
+
+.. _`Siemiginowska et al. 2010`: https://ui.adsabs.harvard.edu/#abs/2010ApJ...722..102S
+
+The script starts with some setup::
+
+  >>> import deproject
+
+  >>> radii = ('2.5', '6', '17')
+  >>> dep = deproject.Deproject(radii=[float(x) for x in radii])
+
+  >>> set_method("levmar")
+  >>> set_stat("cstat")
+
+Now we read in the data as before with ``dep.load_pha()``.  The only
+difference to the :ref:`M87 example <m87_load>`
+is the additional loop over the obsids.  The ``dep.load_pha()`` function
+automatically extracts the obsid (the identifier used to
+discriminate Chandra observations) from the file header.  This is used later in
+the case of setting a background model.
+::
+
+  >>> obsids = (9407, 9774, 9775, 9408)
+  >>> for ann in range(len(radii)  -1):
+  ...     for obsid in obsids:
+  ...         dep.load_pha('3c186/%d/ellipse%s-%s.pi' % (obsid, radii[ann], radii[ann+1]), annulus=ann)
+
+Create and configure the source model expression as usual::
+
+  >>> dep.set_source('xsphabs*xsapec')
+  >>> dep.ignore(None, 0.5)
+  >>> dep.ignore(7, None)
+  >>> dep.freeze("xsphabs.nh")
+
+  >>> dep.set_par('xsapec.redshift', 1.06)
+  >>> dep.set_par('xsphabs.nh', 0.0564)
+
+Set the background model (here we use the IPython ``%run`` magic command
+to evaluate the commands in the file ``acis-s-bkg.py``)::
+
+  >>> %run acis-s-bkg.py
+  >>> acis_s_bkg = get_bkg_source()
+  >>> dep.set_bkg_model(acis_s_bkg)
+
+Fit the projection model::
+
+  >>> dep.fit()

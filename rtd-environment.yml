@@ -1,0 +1,10 @@
+name: deproject
+
+channels:
+  - defaults
+  - sherpa
+  
+dependencies:
+  - python=3.5
+  - numpy
+  - sherpa
