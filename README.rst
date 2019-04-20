@@ -39,19 +39,19 @@ with XSPEC support
 
 The following Python packages are required:
 
- - sherpa
- - `Astropy <http://www.astropy.org/>`_ (restricted to version 3.0 when
-   using CIAO 4.11)
- - `SciPy <https://www.scipy.org/scipylib/>`_.
+- sherpa
+- `Astropy <http://www.astropy.org/>`_ (restricted to version 3.0 when
+  using CIAO 4.11)
+- `SciPy <https://www.scipy.org/scipylib/>`_.
 
 Installation
 ------------
 
 The ``deproject`` module should install with the following command
-(assuming CIAO 4.11 is already installed):
+(assuming CIAO 4.11 is already installed)::
 
   echo "numpy==1.12.1" > constraints.txt
-  pip install -c constraints.txt 'astropy<3.1' deproject
+  pip3 install -c constraints.txt 'astropy<3.1' deproject scipy
 
 Example
 -------
@@ -64,7 +64,7 @@ then a
 `Deproject object <https://deproject-test.readthedocs.io/en/latest/modules/api/deproject.deproject.Deproject.html#deproject.deproject.Deproject>`_
 can be created using the
 `deproject_from_xflt <https://deproject-test.readthedocs.io/en/ciao-411/modules/api/deproject.deproject.deproject_from_xflt.html>`_
-helper routine with the commands:
+helper routine with the commands::
 
   >>> from deproject import deproject_from_xflt
   >>> from astropy import units as u
@@ -79,26 +79,28 @@ This will automatically load the spectra into separate Sherpa datasets,
 which *can* be fitted individually, but it is generally easier to use
 the object returned by ``deproject_from_xflt``. For instance, the
 following will set the data range to be fit for *each* spectra and ensure
-that the background is subtracted before fitting:
+that the background is subtracted before fitting::
 
   >>> dep.ignore(None, 0.5)
   >>> dep.ignore(7.0, None)
   >>> dep.subtract()
 
-Sherpa functions are used to change the statistic and optimiser:
+Sherpa functions are used to change the statistic and optimiser::
 
   >>> from sherpa.astro import ui
   >>> ui.set_stat('chi2xspecvar')
   >>> ui.set_method('levmar')
 
 The data can be fit, and errors estimated for all the parameter, using
-the onion-skin deprojection approach, with the following commands:
+the onion-skin deprojection approach, with the following commands::
 
   >>> onion = dep.fit()
   >>> errs = dep.conf()
 
 The return value includes the density (and errors, if appropriate), as
 an `Astropy Quantity <http://docs.astropy.org/en/stable/units/>`_.
+
+::
 
   >>> print(onion['density'])
   print(onion['density'])
