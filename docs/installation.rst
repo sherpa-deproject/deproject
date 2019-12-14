@@ -21,41 +21,33 @@ Requirements
 
 The package uses `Astropy`_ and `SciPy`_, for units support and
 cosmological-distance calculations. It is assumed that
-`Matplotlib`_ is available for plotting (which is
-included in CIAO 4.11).
+`Matplotlib`_ is available for plotting.
+
+Installation is easier with CIAO 4.12 than CIAO 4.11 since
+CIAO 4.12 is available via conda (so there is less need to
+use a constraints file).
 
 Using pip
 ---------
 
-CIAO
-^^^^
+It should be as simple as starting the CIAO environment - this
+depends on whether CIAO was installed via `ciao-install` or
+`conda` - and then saying::
 
-Installation within CIAO requires:
+  pip install deproject
 
-- having sourced the CIAO initialisation script (e.g.
-  `ciao.csh` or `ciao.bash`);
-  
-- and using a constraints file, to
-  `avoid updating NumPy in CIAO <http://cxc.harvard.edu/ciao/scripting/index.html#install-numpy>`_.
+This approach should also work if you are using the standalone
+version of Sherpa.
 
-It should be as simple as::
+If you are using CIAO 4.11 then you should install `deproject`
+with the following::
 
   echo "numpy==1.12.1" > constraints.txt
   pip install -c constraints.txt 'astropy<3.1' deproject
 
 .. note::
-   The constraints are for CIAO 4.11, please adjust accordingly
-   if using a newer version of CIAO (the Astropy restriction is
-   because version 3.1 requires NumPy version 1.13 or later but
-   CIAO 4.11 is shipped with NumPy version 1.12).
-
-Standalone
-^^^^^^^^^^
-
-When using the standalone Sherpa intallation, the following should
-be all that is required::
-
-  pip install deproject
+   The Astropy restriction is because version 3.1 requires NumPy version
+   1.13 or later but CIAO 4.11 is shipped with NumPy version 1.12.
 
 Manual installation
 -------------------

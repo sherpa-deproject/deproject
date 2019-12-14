@@ -47,11 +47,18 @@ The following Python packages are required:
 Installation
 ------------
 
-The ``deproject`` module should install with the following command
-(assuming CIAO 4.11 is already installed)::
+For Standalone Sherpa or CIAO versions newer than CIAO 4.11,
+you should be able to install ``deproject`` with the command::
+
+  pip3 install deproject
+
+For CIAO 4.11, please use the slightly-more involved::
 
   echo "numpy==1.12.1" > constraints.txt
   pip3 install -c constraints.txt 'astropy<3.1' deproject scipy
+
+which avoids updating NumPy (as this is an untested combination
+with this build).
 
 Example
 -------
