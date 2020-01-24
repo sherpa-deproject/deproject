@@ -8,6 +8,9 @@ docs/_build
 build
 __pycache__
 .cache/
+.pytest_cache/
 
 deproject.egg-info
 .eggs
+
+.coverage
