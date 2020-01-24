@@ -29,9 +29,14 @@ install:
   - source activate test
   - conda install --yes numpy=$NUMPY pytest
   - conda install --yes -c sherpa sherpa
+  - pip install pytest-cov
+  - pip install codecov
 
   # I guess we should actually install the software!
   - pip install .
 
 script:
-  - py.test
+  - py.test --cov
+
+after_success:
+  - codecov
