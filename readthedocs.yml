@@ -8,8 +8,6 @@ sphinx:
 conda:
   environment: rtd-environment.yml
   
-# requirements_file: docs/rtd-pip-requirements
-
 python:
    version: 3.7
    setup_py_install: true
