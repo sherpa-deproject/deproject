@@ -3,8 +3,9 @@ name: deproject
 channels:
   - defaults
   - sherpa
-  
+
 dependencies:
   - python=3.7
   - numpy
   - sherpa
+  - astropy
