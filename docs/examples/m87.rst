@@ -1,7 +1,7 @@
 
 .. include:: ../references.rst
 
-***	     
+***
 M87
 ***
 
@@ -53,15 +53,15 @@ radius of the outer annulus.  Thus the ``radii`` list will be one element
 longer than the number of annuli.
 
 ::
-   
-  >>> print(radii)                                                            
+
+  >>> print(radii)
   [ 14.76  29.52  44.28  59.04  73.8   88.56 103.32 118.08 132.84 147.6
    162.36 177.12 191.88 206.64 221.4  236.16 250.92 265.68 280.44 295.2
    309.96] arcsec
 
 *Now the key step* of creating the :class:`Deproject` object ``dep``.  This
 object is the interface to the all the :mod:`deproject`
-methods used for the deprojection analysis.  
+methods used for the deprojection analysis.
 ::
 
   >>> dep = Deproject(radii, theta=theta, angdist=angdist)
@@ -85,7 +85,7 @@ estimator for M87 we also explicitly set the angular size distance
 using the ``angdist`` parameter.
 
 .. _m87_load:
-   
+
 Load the data
 =============
 
@@ -99,7 +99,7 @@ case ``dep.load_pha(file, annulus)`` loads the PHA file using the
 function but also registers the dataset in the spectral stack::
 
   >>> for annulus in range(len(radii) - 1):
-  ...    dep.load_pha('m87/r%dgrspec.pha' % (annulus + 1), annulus)
+  ...    dep.load_pha(f'm87/r{annulus + 1}grspec.pha', annulus)
 
 .. note::
    The ``annulus`` parameter is required in ``dep.load_pha()`` to allow
@@ -126,27 +126,27 @@ following caveats:
    typical *Sherpa* usage one generates the model component name in the
    model expression, e.g. ``set_source('xswabs.abs1 * xsmekal.mek1')``.  This
    would create model components named ``abs1`` and ``mek1``.  In
-   ``dep.set_source()`` the model component names are auto-generated as 
+   ``dep.set_source()`` the model component names are auto-generated as
    ``<model_type>_<shell>``.
  - Only one of each model type can be used in the model expression.  A source
    model expression like ``"xsmekal + gauss1d + gauss1d"`` would result in an
    error due to the model component auto-naming.
 
 Next any required parameter values are set and their `freeze`_ or `thaw`_
-status are set.  
+status are set.
 ::
 
   >>> dep.set_par('xswabs.nh', 0.0255)
   >>> dep.freeze('xswabs.nh')
-  
+
   >>> dep.set_par('xsmekal.abundanc', 0.5)
   >>> dep.thaw('xsmekal.abundanc')
-  
+
   >>> dep.set_par('xsmekal.redshift', redshift)
 
-As a convenience if any of the model components have a 
+As a convenience if any of the model components have a
 ``redshift`` parameter that value will be used as the default redshift for
-calculating the angular size distance.  
+calculating the angular size distance.
 
 .. _data_selection:
 
@@ -198,24 +198,24 @@ normalizations for the shell/annulus overlaps:
   Dataset               = 19
   ...
   Change in statistic   = 4.60321e+10
-     xsmekal_19.kT   2.748        +/- 0.0551545   
-     xsmekal_19.Abundanc   0.429754     +/- 0.0350466   
-     xsmekal_19.norm   0.00147471   +/- 2.45887e-05 
+     xsmekal_19.kT   2.748        +/- 0.0551545
+     xsmekal_19.Abundanc   0.429754     +/- 0.0350466
+     xsmekal_19.norm   0.00147471   +/- 2.45887e-05
   Projected fit to annulus 18 dataset: 18
   Dataset               = 18
   ...
   Change in statistic   = 4.61945e+10
-     xsmekal_18.kT   2.68875      +/- 0.0543974   
-     xsmekal_18.Abundanc   0.424198     +/- 0.0335045   
-     xsmekal_18.norm   0.00147443   +/- 2.43454e-05 
+     xsmekal_18.kT   2.68875      +/- 0.0543974
+     xsmekal_18.Abundanc   0.424198     +/- 0.0335045
+     xsmekal_18.norm   0.00147443   +/- 2.43454e-05
   ...
   Projected fit to annulus 0 dataset: 0
   Dataset               = 0
   ...
   Change in statistic   = 2.15043e+10
-     xsmekal_0.kT   1.57041      +/- 0.0121572   
-     xsmekal_0.Abundanc   1.05816      +/- 0.0373779   
-     xsmekal_0.norm   0.00152496   +/- 2.93297e-05 
+     xsmekal_0.kT   1.57041      +/- 0.0121572
+     xsmekal_0.Abundanc   1.05816      +/- 0.0373779
+     xsmekal_0.norm   0.00152496   +/- 2.93297e-05
 
 As shown in the screen output, the ``guess`` routine fits each
 annulus in turn, from outer to inner. After each fit, the
@@ -260,6 +260,10 @@ keV is because we :ref:`explicitly excluded this range
    and
    :py:meth:`~deproject.deproject.Deproject.plot_fit`.
 
+   The plot output depends on the version of Sherpa in use (prior to
+   the 4.13 release the models were not displayed as histograms and
+   the filtered-out ranges were not so obvious as they now are).
+
 Fitting the data
 ================
 
@@ -275,9 +279,9 @@ parameters being frozen as each annulus is processed)::
   ...
   Reduced statistic     = 1.07869
   Change in statistic   = 1.29468e-08
-     xsmekal_19.kT   2.748        +/- 0.0551534   
-     xsmekal_19.Abundanc   0.429758     +/- 0.0350507   
-     xsmekal_19.norm   0.249707     +/- 0.00416351  
+     xsmekal_19.kT   2.748        +/- 0.0551534
+     xsmekal_19.Abundanc   0.429758     +/- 0.0350507
+     xsmekal_19.norm   0.249707     +/- 0.00416351
   Freezing xswabs_19
   Freezing xsmekal_19
   Fitting annulus 18  dataset: 18
@@ -285,9 +289,9 @@ parameters being frozen as each annulus is processed)::
   ...
   Reduced statistic     = 1.00366
   Change in statistic   = 13444.5
-     xsmekal_18.kT   2.41033      +/- 0.274986    
-     xsmekal_18.Abundanc   0.375824     +/- 0.136926    
-     xsmekal_18.norm   0.0551815    +/- 0.00441495  
+     xsmekal_18.kT   2.41033      +/- 0.274986
+     xsmekal_18.Abundanc   0.375824     +/- 0.136926
+     xsmekal_18.norm   0.0551815    +/- 0.00441495
   Freezing xswabs_18
   Freezing xsmekal_18
   ...
@@ -297,14 +301,9 @@ parameters being frozen as each annulus is processed)::
   Dataset               = 0
   ...
   Reduced statistic     = 2.72222
-  Change in statistic   = 12115.6
-     xsmekal_0.kT   1.63329      +/- 0.0278325   
-     xsmekal_0.Abundanc   1.1217       +/- 0.094871    
-     xsmekal_0.norm   5.7067       +/- 0.262766    
-  Change in statistic   = 13699.6
-     xsmekal_0.kT   1.64884      +/- 0.0242336   
-     xsmekal_0.Abundanc   1.14629      +/- 0.0903398   
-     xsmekal_0.norm   5.68824      +/- 0.245884    
+     xsmekal_0.kT   1.64884      +/- 0.0242336
+     xsmekal_0.Abundanc   1.14629      +/- 0.0903398
+     xsmekal_0.norm   5.68824      +/- 0.245884
   ...
 
 The fit to the central annulus (dataset 0) now looks like::
@@ -341,10 +340,10 @@ The fit results can also be retrieved with the
 method.
 
 ::
-  
+
   >>> print(onion)
-  annulus rlo_ang rhi_ang ...     xsmekal.norm          density       
-           arcsec  arcsec ...                           1 / cm3       
+  annulus rlo_ang rhi_ang ...     xsmekal.norm          density
+           arcsec  arcsec ...                           1 / cm3
   ------- ------- ------- ... ------------------- --------------------
         0   14.76   29.52 ...  5.6882389946381275   0.1100953546292787
         1   29.52   44.28 ...  2.8089409208987233  0.07736622021374819
@@ -432,8 +431,8 @@ or
 methods. The columns depend on the command (i.e. fit or error results)::
 
   >>> print(errs)
-  annulus rlo_ang rhi_ang ...        density_lo             density_hi      
-           arcsec  arcsec ...         1 / cm3                1 / cm3        
+  annulus rlo_ang rhi_ang ...        density_lo             density_hi
+           arcsec  arcsec ...         1 / cm3                1 / cm3
   ------- ------- ------- ... ----------------------- ----------------------
         0   14.76   29.52 ...  -0.0023299300992805777  0.0022816336635322065
         1   29.52   44.28 ...  -0.0015878693875514133  0.0015559288091097495
@@ -496,4 +495,3 @@ of XSPEC used for the two cases does not match):
 
 .. image:: m87_compare_density.png
 .. image:: m87_compare_temperature.png
-
