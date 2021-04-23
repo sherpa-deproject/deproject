@@ -1,7 +1,7 @@
 """
 Limited testing of deproject.deproject
 
-:Copyright: Smithsonian Astrophysical Observatory (2019)
+:Copyright: Smithsonian Astrophysical Observatory (2019, 2021)
 :Author: Douglas Burke (dburke@cfa.harvard.edu)
 """
 
@@ -186,8 +186,10 @@ def _test_data(annulus=0):
 def test_fail_radii_type(rad):
     """Need units for radii"""
 
+    # The exact message depends on the AstroPy version.
+    #
     estr = "Argument 'radii' to function '__init__' " + \
-           "has no 'unit' attribute. You may want to pass " + \
+           "has no 'unit' attribute. You .* pass " + \
            "in an astropy Quantity instead."
     with pytest.raises(TypeError, match=estr):
         Deproject(rad)
@@ -523,8 +525,10 @@ def test_init_angdist_type_fail():
     """Does setting angdist to an invalid value (no type).
     """
 
+    # The exact message depends on the AstroPy version.
+    #
     estr = "Argument 'angdist' to function '__init__' " + \
-           "has no 'unit' attribute. You may want to pass " + \
+           "has no 'unit' attribute. You .* pass " + \
            "in an astropy Quantity instead."
     with pytest.raises(TypeError, match=estr):
         Deproject([0, 10, 20] * u.arcsec, angdist=123.4)
@@ -535,8 +539,10 @@ def test_set_angdist_type_fail():
 
     dep = Deproject([0, 10, 20] * u.arcsec)
 
+    # The exact message depends on the AstroPy version.
+    #
     estr = "Argument 'angdist' to function '_set_angdist' " + \
-           "has no 'unit' attribute. You may want to pass " + \
+           "has no 'unit' attribute. You .* pass " + \
            "in an astropy Quantity instead."
     with pytest.raises(TypeError, match=estr):
         dep.angdist = 123.4
@@ -588,8 +594,10 @@ def test_set_angdist_invalid_fail(angdist):
 def test_fail_theta_type(theta):
     """Need units for theta"""
 
+    # The exact message depends on the AstroPy version.
+    #
     estr = "Argument 'theta' to function '__init__' " + \
-           "has no 'unit' attribute. You may want to pass " + \
+           "has no 'unit' attribute. You .* pass " + \
            "in an astropy Quantity instead."
     with pytest.raises(TypeError, match=estr):
         Deproject([0, 10, 20] * u.arcsec, theta=theta)
