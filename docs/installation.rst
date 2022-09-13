@@ -4,17 +4,15 @@
 Installation
 ============
 
-As of :ref:`version 0.2.0 <changes_020>`,
-the :mod:`deproject` package can be installed
-directly from `PyPI`_. This requires
-`CIAO 4.11 <http://cxc.harvard.edu/ciao/>`_
-or later (as installation with pip in earlier versions of
-CIAO is not well supported). The module *can* be used with the
-`standalone release of
-Sherpa <https://sherpa.readthedocs.io/en/latest/ciao.html>`_,
-but it is only useful if Sherpa has been built with
-`XSPEC support <https://sherpa.readthedocs.io/en/latest/install.html#xspec>`_
-which is trickier to achieve than we would like.
+As of :ref:`version 0.2.0 <changes_020>`, the :mod:`deproject` package
+can be installed directly from `PyPI`_. This requires `CIAO 4.11
+<http://cxc.harvard.edu/ciao/>`_ or later (in general the latest
+release of CIAO should be used). The module *can* be used with the
+`standalone release of Sherpa
+<https://sherpa.readthedocs.io/en/latest/ciao.html>`_, but it is only
+useful if Sherpa has been built with `XSPEC support
+<https://sherpa.readthedocs.io/en/latest/install.html#xspec>`_ which
+is trickier to achieve than we would like.
 
 Requirements
 ------------
@@ -23,9 +21,9 @@ The package uses `Astropy`_ and `SciPy`_, for units support and
 cosmological-distance calculations. It is assumed that
 `Matplotlib`_ is available for plotting.
 
-Installation is easier with CIAO 4.12 than CIAO 4.11 since
-CIAO 4.12 is available via conda (so there is less need to
-use a constraints file).
+It is **strongly** advised to use the latest CIAO (at the time
+of writing this is CIAO 4.14) installed with conda. Support
+for CIAO installed via the ciao-install script is limited.
 
 Using pip
 ---------
@@ -39,16 +37,6 @@ depends on whether CIAO was installed via `ciao-install` or
 This approach should also work if you are using the standalone
 version of Sherpa.
 
-If you are using CIAO 4.11 then you should install `deproject`
-with the following::
-
-  echo "numpy==1.12.1" > constraints.txt
-  pip install -c constraints.txt 'astropy<3.1' deproject
-
-.. note::
-   The Astropy restriction is because version 3.1 requires NumPy version
-   1.13 or later but CIAO 4.11 is shipped with NumPy version 1.12.
-
 Manual installation
 -------------------
 
@@ -61,7 +49,7 @@ by cloning the repository) and moving into the directory
 (`deproject-<version>` or `deproject`), installation just
 requires::
 
-  python setup.py install
+  pip install .
 
 .. note::
    This command should only be run after setting up CIAO or whatever
@@ -71,17 +59,11 @@ Test
 ----
 
 The source installation includes a basic test suite, which can be
-run with either
+run with
 
 ::
    
   pytest
-
-or
-
-::
-   
-  python setup.py test
 
 Example data
 ------------
