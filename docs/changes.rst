@@ -5,9 +5,9 @@
 Changes
 *******
 
-.. _changes_021:
+.. _changes_022:
 
-Version 0.2.1
+Version 0.2.2
 =============
 
 The build system has been updated to use ``pip`` rather than
@@ -17,6 +17,13 @@ The build system has been updated to use ``pip`` rather than
 Some plotting code related to ChIPS has been removed, and code has
 been updated to reflect recent changes in Sherpa. The minimum
 supported version of Sherpa has been bumped to 4.14.0.
+
+.. _changes_021:
+
+Version 0.2.1
+=============
+
+This is not the release you were looking for. It never happened.
 
 .. _changes_020:
 
