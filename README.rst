@@ -40,8 +40,7 @@ with XSPEC support
 The following Python packages are required:
 
 - sherpa
-- `Astropy <http://www.astropy.org/>`_ (restricted to version 3.0 when
-  using CIAO 4.11)
+- `Astropy <http://www.astropy.org/>`_
 - `SciPy <https://www.scipy.org/scipylib/>`_.
 
 Installation
@@ -52,13 +51,13 @@ you should be able to install ``deproject`` with the command::
 
   pip3 install deproject
 
-For CIAO 4.11, please use the slightly-more involved::
+The installation requires pip version 19 or higher, but as that
+was released in early 2019 it should be available.
 
-  echo "numpy==1.12.1" > constraints.txt
-  pip3 install -c constraints.txt 'astropy<3.1' deproject scipy
-
-which avoids updating NumPy (as this is an untested combination
-with this build).
+The `installation documentation
+<https://deproject.readthedocs.io/installation.html>`_ describes how
+to build a development version from the `GitHub repository
+<https://github.com/sherpa-deprojcet/deproject>`_.
 
 Example
 -------

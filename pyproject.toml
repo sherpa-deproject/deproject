@@ -1,0 +1,5 @@
+[build-system]
+requires = ["setuptools >= 51.0.0, < 60",  # follow Sherpa
+            "wheel"
+            ]
+build-backend = "setuptools.build_meta"

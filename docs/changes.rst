@@ -5,6 +5,15 @@
 Changes
 *******
 
+.. _changes_021:
+
+Version 0.2.1
+=============
+
+The build system has been updated to use ``pip`` rather than
+``setup.py``. Please report any problems on the
+`issues page <https://github.com/sherpa-deproject/deproject/issues/>`_.
+
 .. _changes_020:
 
 Version 0.2.0
