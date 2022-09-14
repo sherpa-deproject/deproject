@@ -7,6 +7,7 @@ dependencies:
   - python=3.8
   - pip
   - numpy
-  - sherpa
   - astropy
   - scipy
+  - pip:
+    - sherpa
