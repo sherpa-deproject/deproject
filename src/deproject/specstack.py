@@ -10,7 +10,7 @@ Note that the :mod:`specstack` module is currently distributed within with the
 :mod:`deproject` package.  `Specstack` is not yet fully documented or tested
 outside the context of `deproject`.
 
-:Copyright: Smithsonian Astrophysical Observatory (2009, 2019)
+:Copyright: Smithsonian Astrophysical Observatory (2009, 2019, 2022)
 :Author: Tom Aldcroft (taldcroft@cfa.harvard.edu), Douglas Burke (dburke@cfa.harvard.edu)
 """
 
@@ -24,15 +24,7 @@ try:
 except ImportError:
     backend_name = 'none'
 
-# Trying to move away from direct access to I/O and plotting code.
-#
-if backend_name == 'pychips':
-    try:
-        import pychips
-    except ImportError:
-        pass
-
-elif backend_name == 'pylab':
+if backend_name == 'pylab':
     try:
         import matplotlib.pyplot as plt
     except ImportError:
@@ -698,9 +690,7 @@ class SpecStack:
 
         Notes
         -----
-        This method attempts to handle the differences when using
-        ChIPS or Matplotlib as the Sherpa plotting backend, but has
-        not been properly tested, so there may be issues.
+        This may need work as pottibg backends get added to Sherpa.
 
         It is known not to work when the input function is plot_fit_delchi
         or plot_fit_resid, at least with the Matplotlib backend. It is
@@ -729,14 +719,7 @@ class SpecStack:
         nargs = len(args)
 
         for shell in range(self.nshell):
-            if backend_name == 'pychips':
-                window_id = 'Shell%d' % shell
-                try:
-                    pychips.add_window(['id', window_id])
-                except RuntimeError:
-                    pychips.set_current_window(window_id)
-
-            elif backend_name == 'pylab':
+            if backend_name == 'pylab':
                 plt.figure(shell)
 
             new_args = args
@@ -769,8 +752,7 @@ class SpecStack:
         Parameters
         ----------
         args
-            The arguments to be sent to the "create a hardcopy" routine
-            (print_window for ChIPS and savefig for Matplotlib).
+            The arguments to be sent to the "create a hardcopy" routine.
             The first argument, if given, is assumed to be the file name
             and so will have the shell number added to it.
         kwargs
@@ -801,9 +783,7 @@ class SpecStack:
             kwargs['add_shell_value'] = True
 
         kwargs['single_call_per_shell'] = True
-        if backend_name == 'pychips':
-            plotfn = pychips.plot_window
-        elif backend_name == 'pylab':
+        if backend_name == 'pylab':
             plotfn = plt.savefig
         else:
             raise RuntimeError("Unrecognized plotting backend: {}".format(backend_name))
@@ -814,16 +794,13 @@ class SpecStack:
         pass
 
     try:
-        if backend_name == 'pychips':
-            log_scale = _sherpa_plot_func_single(pychips.log_scale)
-            linear_scale = _sherpa_plot_func_single(pychips.linear_scale)
-        elif backend_name == 'pylab':
+        if backend_name == 'pylab':
             # should be able to handle this
             log_scale = dummyfunc
             linear_scale = dummyfunc
 
     except NameError:
-        # Allow doc generation to work without pychips
+        # Allow doc generation to work without a backend
         log_scale = dummyfunc
         linear_scale = dummyfunc
 

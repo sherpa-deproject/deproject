@@ -14,6 +14,10 @@ The build system has been updated to use ``pip`` rather than
 ``setup.py``. Please report any problems on the
 `issues page <https://github.com/sherpa-deproject/deproject/issues/>`_.
 
+Some plotting code related to ChIPS has been removed, and code has
+been updated to reflect recent changes in Sherpa. The minimum
+supported version of Sherpa has been bumped to 4.14.0.
+
 .. _changes_020:
 
 Version 0.2.0

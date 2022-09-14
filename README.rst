@@ -30,7 +30,7 @@ Requirements
 ------------
 
 The installation assumes that you are installing ``deproject`` into
-the `CIAO environment <http://cxc.harvard.edu/ciao/>`_ (CIAO 4.11 or
+the `CIAO environment <http://cxc.harvard.edu/ciao/>`_ (CIAO 4.14 or
 later), since this is the easiest way to get the XSPEC models along
 with Sherpa. The `standalone Sherpa <https://sherpa.readthedocs.io/>`_
 version can be used, but in this case you will need to `build Sherpa
@@ -39,14 +39,14 @@ with XSPEC support
 
 The following Python packages are required:
 
-- sherpa
+- sherpa >= 4.14.0
 - `Astropy <http://www.astropy.org/>`_
 - `SciPy <https://www.scipy.org/scipylib/>`_.
 
 Installation
 ------------
 
-For Standalone Sherpa or CIAO versions newer than CIAO 4.11,
+For Standalone Sherpa or CIAO versions newer than CIAO 4.14,
 you should be able to install ``deproject`` with the command::
 
   pip3 install deproject

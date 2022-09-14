@@ -7,7 +7,7 @@ temperature, metallicity, and density distributions of an optically-thin
 plasma from the observed (projected) two-dimensional data, arranged in
 concentric circular annuli.
 
-:Copyright: Smithsonian Astrophysical Observatory (2009, 2019)
+:Copyright: Smithsonian Astrophysical Observatory (2009, 2019, 2022)
 :Author: Tom Aldcroft (taldcroft@cfa.harvard.edu), Douglas Burke (dburke@cfa.harvard.edu)
 """
 
@@ -22,7 +22,7 @@ from astropy.table import Table
 from astropy import units as u
 from astropy.cosmology import Planck15
 
-from sherpa.plot import plotter
+from sherpa.plot import backend
 from sherpa.astro import ui
 from sherpa.astro.io import read_pha
 from sherpa.models.parameter import CompositeParameter
@@ -1330,19 +1330,17 @@ class Deproject(specstack.SpecStack):
 
         rlo, rhi = self.get_radii(units=xunits)
 
-        # drop units support immediately as ChIPS doesn't recognize
+        # Drop units support immediately as ChIPS doesn't recognize
         # this (can support them in matplotlib, but given the
         # Sherpa plotting API it isn't clear how well supported it
-        # would be)
+        # would be). Given we no-longer support ChIPS can we
+        # re-instate this?
         #
         rmid = (rlo.value + rhi.value) / 2
         dr = rhi.value - rlo.value
 
         # Attempt to handle LaTeX differences between the backends,
         # but the support is *very* limited so may not work here.
-        #
-        # The aim is to support the matplotlib backend, with minimal
-        # support for ChIPS.
         #
         xlabel = _add_unit('Radius', rlo)
         if ylabel.find('_') > -1 or ylabel.find('^') > -1:
@@ -1352,72 +1350,32 @@ class Deproject(specstack.SpecStack):
             # labels that have AstroPy unit strings, since they
             # have already been protected.
             #
-            if not (plotter.name == 'pylab' and ylabel.find('$') > -1):
-                ylabel = plotter.get_latex_for_string(ylabel)
+            if not (backend.name == 'pylab' and ylabel.find('$') > -1):
+                ylabel = backend.get_latex_for_string(ylabel)
 
-        prefs = plotter.get_data_plot_defaults()
+        prefs = backend.get_data_plot_defaults()
         prefs['xerrorbars'] = True
-
-        # We handle error bars manually for ChIPS (it has to be done
-        # for asymmetric Y errors, but there also seems to be issues
-        # with the X axis errors not being drawn which I do not
-        # want to investigate too much just right now).
-        #
-        manual_errors = plotter.name == 'chips' and dys is not None
-
         prefs['yerrorbars'] = dys is not None
-        if manual_errors:
-            prefs['yerrorbars'] = False
 
         prefs['xlog'] = xlog
         prefs['ylog'] = ylog
 
         # Access the underlying plot machinery directly, rather than
         # use the sherpa.plot.DataPlot object, since Sherpa does not
-        # support asymmetric errors but plotter.plot does, at least
+        # support asymmetric errors but backend.plot does, at least
         # for the pylab backend.
         #
         try:
-            plotter.begin()
-            plotter.plot(rmid, ys, dys, dr, plottitle, xlabel, ylabel,
+            backend.begin()
+            backend.plot(rmid, ys, dys, dr, plottitle, xlabel, ylabel,
                          overplot, clearwindow, **prefs)
 
-            # For some reason the X error bar isn't being drawn with ChIPS
-            # so force it.
-            #
-            if plotter.name == 'chips':
-                import pychips
-
-                # Assume the current curve is the data we have just plotted
-                # and we do not want to replot the symbol.
-                #
-                crv = pychips.get_curve()
-                crv.symbol.style = 'none'
-                crv.err.up = True
-                crv.err.down = True
-                crv.err.left = True
-                crv.err.right = True
-
-                ndim = numpy.asarray(dys).ndim
-                if ndim == 2:
-                    dylo = dys[0]
-                    dyhi = dys[1]
-                elif ndim == 1:
-                    dylo = dys
-                    dyhi = dys
-                else:
-                    dylo = None
-                    dyhi = None
-
-                errs = [dylo, dyhi, dr / 2, dr / 2]
-                pychips.add_curve(rmid, ys, errs, crv)
-
         except BaseException as exc:
-            plotter.exceptions()
+            backend.exceptions()
             raise exc
 
         else:
-            plotter.end()
+            backend.end()
 
     def par_plot(self, par, units='kpc',
                  xlog=True, ylog=False,
