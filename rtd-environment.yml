@@ -2,13 +2,9 @@ name: deproject
 
 channels:
   - defaults
-  - https://cxc.harvard.edu/conda/ciao
-  - conda-forge
 
 dependencies:
   - python=3.8
   - pip
-  - numpy
-  - astropy
-  - scipy
-  - sherpa
+  - bison
+  - flex
