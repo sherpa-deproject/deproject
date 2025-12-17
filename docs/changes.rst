@@ -5,6 +5,20 @@
 Changes
 *******
 
+.. _changes_023:
+
+Version 0.2.3
+=============
+
+The build system has been changed from setuptools to
+`hatchling <https://hatch.pypa.io/dev/config/build/>`_, although
+hopefully this change is not visible to users.
+
+The minimum supported version of Sherpa has been bumped to
+4.18.0 (this is only because I have *very* time to support this
+project, and not because changes in Sherpa 4.18.0 required
+changes).
+
 .. _changes_022:
 
 Version 0.2.2
